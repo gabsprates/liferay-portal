@@ -9,12 +9,12 @@
  * distribution rights of the Software.
  */
 
-import {useContext} from 'react';
+import React, {useContext} from 'react';
 
-import {ClaimResourcesContext} from './context';
+const ClaimResourcesContext = React.createContext<string>('');
 
-const useClaimResources = () => {
+export const ClaimResources = ClaimResourcesContext.Provider;
+
+export function useClaimResources() {
 	return useContext(ClaimResourcesContext);
-};
-
-export default useClaimResources;
+}

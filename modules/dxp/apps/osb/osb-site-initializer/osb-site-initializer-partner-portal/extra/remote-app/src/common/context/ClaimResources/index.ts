@@ -9,5 +9,4 @@
  * distribution rights of the Software.
  */
 
-export {default as useClaimResources} from './hook';
-export {default as ClaimResources} from './provider';
+export {ClaimResources, useClaimResources} from './ClaimResources';
