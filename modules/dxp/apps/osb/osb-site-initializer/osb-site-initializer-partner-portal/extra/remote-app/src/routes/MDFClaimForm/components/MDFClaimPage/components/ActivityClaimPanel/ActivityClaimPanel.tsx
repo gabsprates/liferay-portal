@@ -18,7 +18,7 @@ import {useCallback, useState} from 'react';
 
 import PRMForm from '../../../../../../common/components/PRMForm';
 import PRMFormik from '../../../../../../common/components/PRMFormik';
-import {useClaimResources} from '../../../../../../common/context/ClaimResources';
+import {useWebDAV} from '../../../../../../common/context/WebDAV';
 import MDFClaim from '../../../../../../common/interfaces/mdfClaim';
 import MDFClaimActivity from '../../../../../../common/interfaces/mdfClaimActivity';
 import getIntlNumberFormat from '../../../../../../common/utils/getIntlNumberFormat';
@@ -55,7 +55,7 @@ const ActivityClaimPanel = ({
 		)
 	);
 
-	const claimResources = useClaimResources();
+	const webDAV = useWebDAV();
 
 	const currentBudgetFieldName = `activities[${activityIndex}].budgets[${currentBudgetIndex}]`;
 
@@ -160,7 +160,7 @@ const ActivityClaimPanel = ({
 								button
 								displayType="secondary"
 								download
-								href={`${claimResources}qualified_leads_template.xlsx`}
+								href={`${webDAV}/claim/qualified_leads_template.xlsx`}
 								small
 								target="_blank"
 							>

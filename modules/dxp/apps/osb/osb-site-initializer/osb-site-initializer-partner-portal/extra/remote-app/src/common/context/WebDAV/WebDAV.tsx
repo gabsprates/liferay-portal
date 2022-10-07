@@ -11,10 +11,10 @@
 
 import React, {useContext} from 'react';
 
-const ClaimResourcesContext = React.createContext<string>('');
+const WebDAVContext = React.createContext<string>('');
 
-export const ClaimResources = ClaimResourcesContext.Provider;
+export const WebDAV = WebDAVContext.Provider;
 
-export function useClaimResources() {
-	return useContext(ClaimResourcesContext);
+export function useWebDAV() {
+	return useContext(WebDAVContext);
 }

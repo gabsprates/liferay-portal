@@ -9,4 +9,4 @@
  * distribution rights of the Software.
  */
 
-export {ClaimResources, useClaimResources} from './ClaimResources';
+export {WebDAV, useWebDAV} from './WebDAV';
