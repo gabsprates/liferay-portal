@@ -13,6 +13,7 @@ import {ClayIconSpriteContext} from '@clayui/icon';
 import {Root, createRoot} from 'react-dom/client';
 import {SWRConfig} from 'swr';
 
+import {ClaimResources} from './common/context/ClaimResources';
 import {AppRouteType} from './common/enums/appRouteType';
 import getIconSpriteMap from './common/utils/getIconSpriteMap';
 import handleError from './common/utils/handleError';
@@ -21,6 +22,7 @@ import MDFRequestForm from './routes/MDFRequestForm';
 import MDFRequestList from './routes/MDFRequestList';
 
 interface IProps {
+	claimResources: string;
 	route: AppRouteType;
 }
 
@@ -34,7 +36,7 @@ const appRoutes: AppRouteComponent = {
 	[AppRouteType.MDF_CLAIM_FORM]: <MDFClaimForm />,
 };
 
-const PartnerPortalApp = ({route}: IProps) => {
+const PartnerPortalApp = ({claimResources, route}: IProps) => {
 	return (
 		<SWRConfig
 			value={{
@@ -44,9 +46,11 @@ const PartnerPortalApp = ({route}: IProps) => {
 				shouldRetryOnError: false,
 			}}
 		>
-			<ClayIconSpriteContext.Provider value={getIconSpriteMap()}>
-				{appRoutes[route]}
-			</ClayIconSpriteContext.Provider>
+			<ClaimResources value={claimResources}>
+				<ClayIconSpriteContext.Provider value={getIconSpriteMap()}>
+					{appRoutes[route]}
+				</ClayIconSpriteContext.Provider>
+			</ClaimResources>
 		</SWRConfig>
 	);
 };
@@ -60,6 +64,9 @@ class PartnerPortalRemoteAppComponent extends HTMLElement {
 
 			this.root.render(
 				<PartnerPortalApp
+					claimResources={
+						super.getAttribute('claimResources') as string
+					}
 					route={super.getAttribute('route') as AppRouteType}
 				/>
 			);
