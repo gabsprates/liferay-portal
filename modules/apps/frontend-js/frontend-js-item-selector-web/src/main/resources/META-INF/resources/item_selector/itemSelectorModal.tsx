@@ -12,7 +12,7 @@ import {
 } from '@liferay/frontend-data-set-web';
 import classNames from 'classnames';
 import {sub} from 'frontend-js-web';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 export interface IItemSelectorModalProps<T> {
 
@@ -74,6 +74,12 @@ function ItemSelectorModal<T extends Record<string, any>>({
 	type,
 }: IItemSelectorModalProps<T>) {
 	const [selectedItems, setSelectedItems] = useState(() => externalItems);
+
+	useEffect(() => {
+		if (!open) {
+			setSelectedItems(externalItems);
+		}
+	}, [externalItems, open]);
 
 	const getSelectedItemName = function (selectedItem: T) {
 		if (typeof itemNameLocator === 'string') {
@@ -154,8 +160,6 @@ function ItemSelectorModal<T extends Record<string, any>>({
 							className="btn-cancel"
 							displayType="secondary"
 							onClick={() => {
-								setSelectedItems([]);
-
 								onOpenChange(false);
 							}}
 						>
