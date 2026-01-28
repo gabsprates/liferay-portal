@@ -5,6 +5,8 @@
 
 package com.liferay.configuration.admin.web.internal.portlet.action;
 
+import aQute.bnd.annotation.metatype.Meta;
+
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.display.ConfigurationFormRenderer;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.resource.manager.ClassLoaderResourceManager;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.settings.LocationVariableResolver;
 import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
+import com.liferay.portal.kernel.settings.definition.ConfigurationPidMapping;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -44,8 +47,12 @@ import jakarta.portlet.ActionResponse;
 import jakarta.portlet.PortletException;
 import jakarta.portlet.PortletURL;
 
+import jakarta.validation.ValidationException;
+
 import java.io.IOException;
 import java.io.Serializable;
+
+import java.lang.reflect.Method;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -205,6 +212,17 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 				"mvcRenderCommandName",
 				"/configuration_admin/edit_configuration");
 		}
+		catch (ValidationException
+					validationException) {
+
+			SessionErrors.add(
+				actionRequest, ValidationException.class,
+				validationException);
+
+			actionResponse.setRenderParameter(
+				"mvcRenderCommandName",
+				"/configuration_admin/edit_configuration");
+		}
 		catch (IOException ioException) {
 			throw new PortletException(ioException);
 		}
@@ -227,6 +245,8 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 			boolean scoped = !scope.equals(
 				ExtendedObjectClassDefinition.Scope.SYSTEM.getValue());
+
+			_validateSomethingRenameLater(configurationModel, properties);
 
 			if ((configuration == null) ||
 				!configurationModel.hasScopeConfiguration(scope)) {
@@ -303,6 +323,9 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 			throw configurationModelListenerException;
 		}
+		catch (ValidationException validationException) {
+			throw validationException;
+		}
 		catch (IOException ioException) {
 			throw new PortletException(ioException);
 		}
@@ -365,6 +388,33 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 
 		return properties;
+	}
+
+	private void _validateSomethingRenameLater(
+		ConfigurationModel configurationModel,
+		Dictionary<String, Object> properties
+	) {
+		ConfigurationPidMapping configurationPidMapping = _settingsLocatorHelper.getConfigurationPidMapping(configurationModel.getID());
+
+		Class<?> configurationBeanClass = configurationPidMapping.getConfigurationBeanClass();
+
+		for (Method method : configurationBeanClass.getMethods()) {
+			Meta.AD ad = method.getAnnotation(Meta.AD.class);
+			Object value = properties.get(method.getName());
+
+			if (ad == null) {
+				continue;
+			}
+
+			if (ad.min() == null) {
+				continue;
+			}
+
+			if (Long.parseLong(ad.min()) > ((Number) value).longValue()) {
+				throw new ValidationException(
+					"The minimum possible value for \"" + method.getName() + "\" is " + value);
+			}
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

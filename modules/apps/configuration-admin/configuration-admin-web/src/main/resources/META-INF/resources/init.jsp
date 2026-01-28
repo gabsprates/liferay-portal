@@ -56,7 +56,8 @@ page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.site.navigation.taglib.servlet.taglib.util.BreadcrumbEntriesUtil" %><%@
 page import="com.liferay.taglib.servlet.PipingServletResponseFactory" %>
 
-<%@ page import="jakarta.portlet.PortletURL" %>
+<%@ page import="jakarta.portlet.PortletURL" %><%@
+page import="jakarta.validation.ValidationException" %>
 
 <%@ page import="java.util.List" %><%@
 page import="java.util.ResourceBundle" %>

@@ -54,6 +54,15 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(categoryDisplayName);
 %>
 
+<liferay-ui:error exception="<%= ValidationException.class %>">
+
+	<%
+	ValidationException cmle = (ValidationException)errorException;
+	%>
+
+	<liferay-ui:message key="<%= HtmlUtil.escape(cmle.getMessage()) %>" localizeKey="<%= false %>" />
+</liferay-ui:error>
+
 <liferay-ui:error exception="<%= ConfigurationModelListenerException.class %>">
 
 	<%
