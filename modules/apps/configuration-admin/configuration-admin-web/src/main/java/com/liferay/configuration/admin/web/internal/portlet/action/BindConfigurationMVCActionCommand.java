@@ -393,7 +393,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 	private void _validateSomethingRenameLater(
 		ConfigurationModel configurationModel,
 		Dictionary<String, Object> properties
-	) {
+	) throws ValidationException {
 		ConfigurationPidMapping configurationPidMapping = _settingsLocatorHelper.getConfigurationPidMapping(configurationModel.getID());
 
 		Class<?> configurationBeanClass = configurationPidMapping.getConfigurationBeanClass();
@@ -402,17 +402,16 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			Meta.AD ad = method.getAnnotation(Meta.AD.class);
 			Object value = properties.get(method.getName());
 
-			if (ad == null) {
+			if (ad == null || ad.min() == null || Meta.NULL.equals(ad.min())) {
 				continue;
 			}
 
-			if (ad.min() == null) {
-				continue;
-			}
+			long minValue = Long.parseLong(ad.min());
+			long actualValue = ((Number) value).longValue();
 
-			if (Long.parseLong(ad.min()) > ((Number) value).longValue()) {
+			if (minValue > actualValue) {
 				throw new ValidationException(
-					"The minimum possible value for \"" + method.getName() + "\" is " + value);
+					"The minimum possible value for \"" + method.getName() + "\" is " + minValue + ".");
 			}
 		}
 	}
