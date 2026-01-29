@@ -323,9 +323,6 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 			throw configurationModelListenerException;
 		}
-		catch (ValidationException validationException) {
-			throw validationException;
-		}
 		catch (IOException ioException) {
 			throw new PortletException(ioException);
 		}
