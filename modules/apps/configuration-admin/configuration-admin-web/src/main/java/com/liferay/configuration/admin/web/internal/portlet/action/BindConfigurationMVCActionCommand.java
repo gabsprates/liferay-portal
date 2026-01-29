@@ -243,7 +243,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			boolean scoped = !scope.equals(
 				ExtendedObjectClassDefinition.Scope.SYSTEM.getValue());
 
-			_validateSomethingRenameLater(configurationModel, properties);
+			_validateProperties(configurationModel, properties);
 
 			if ((configuration == null) ||
 				!configurationModel.hasScopeConfiguration(scope)) {
@@ -384,7 +384,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		return properties;
 	}
 
-	private void _validateSomethingRenameLater(
+	private void _validateProperties(
 		ConfigurationModel configurationModel,
 		Dictionary<String, Object> properties
 	) throws ValidationException {
