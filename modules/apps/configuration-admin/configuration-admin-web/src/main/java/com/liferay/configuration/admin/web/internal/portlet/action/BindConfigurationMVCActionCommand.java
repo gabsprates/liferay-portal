@@ -5,8 +5,6 @@
 
 package com.liferay.configuration.admin.web.internal.portlet.action;
 
-import aQute.bnd.annotation.metatype.Meta;
-
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.display.ConfigurationFormRenderer;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
@@ -16,6 +14,7 @@ import com.liferay.configuration.admin.web.internal.util.ConfigurationFormRender
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelRetriever;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelToDDMFormConverter;
 import com.liferay.configuration.admin.web.internal.util.DDMFormValuesToPropertiesConverter;
+import com.liferay.configuration.admin.web.internal.util.MetatypeAnnotationValidator;
 import com.liferay.configuration.admin.web.internal.util.ResourceBundleLoaderProviderUtil;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -51,8 +50,6 @@ import jakarta.validation.ValidationException;
 
 import java.io.IOException;
 import java.io.Serializable;
-
-import java.lang.reflect.Method;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -395,22 +392,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 		Class<?> configurationBeanClass = configurationPidMapping.getConfigurationBeanClass();
 
-		for (Method method : configurationBeanClass.getMethods()) {
-			Meta.AD ad = method.getAnnotation(Meta.AD.class);
-			Object value = properties.get(method.getName());
-
-			if (ad == null || ad.min() == null || Meta.NULL.equals(ad.min())) {
-				continue;
-			}
-
-			long minValue = Long.parseLong(ad.min());
-			long actualValue = ((Number) value).longValue();
-
-			if (minValue > actualValue) {
-				throw new ValidationException(
-					"The minimum possible value for \"" + method.getName() + "\" is " + minValue + ".");
-			}
-		}
+		MetatypeAnnotationValidator.validateValuesWithMetatypeAnnotation(configurationBeanClass.getMethods(), properties);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
