@@ -7,19 +7,22 @@ import React from 'react';
 
 import {IFileDropSettings} from './utils/types';
 
-export type THandleFileDrop = (droppedItem: any, dropTarget?: any) => void;
+export type THandleFileDrop = (
+	droppedItem: {files: File[]},
+	dropTarget?: unknown
+) => void;
 
 export interface IFrontendDataSetDropContext {
 	fileDropSettings: IFileDropSettings;
 	handleFileDrop: THandleFileDrop;
 }
 
-const DnDContext = React.createContext({
+const DnDContext = React.createContext<IFrontendDataSetDropContext>({
 	fileDropSettings: {
 		enabled: false,
 		isDropTarget: () => true,
 	},
 	handleFileDrop: () => {},
-} as unknown as IFrontendDataSetDropContext);
+});
 
 export default DnDContext;

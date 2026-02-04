@@ -273,7 +273,10 @@ export interface IView {
 	views?: Array<any>;
 }
 
-export type TOnFileDrop = (droppedFiles: File[], dropTarget: any) => void;
+export type TOnFileDrop = (
+	droppedFiles: File[],
+	dropTarget?: unknown | null | undefined
+) => void;
 
 export interface IFileDropSettings {
 	enabled: boolean;

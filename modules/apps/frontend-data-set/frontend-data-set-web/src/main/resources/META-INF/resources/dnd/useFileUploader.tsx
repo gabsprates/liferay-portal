@@ -23,14 +23,12 @@ const useFileUploader = ({
 }: {
 	fileDropSettings: IFileDropSettings;
 	selectedItemsKey: string | undefined;
-}): {
-	handleFileDrop: THandleFileDrop;
-} => {
+}) => {
 	const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
-	const [dropTarget, setDropTarget] = useState(null);
+	const [dropTarget, setDropTarget] = useState<unknown | null>(null);
 
-	const defaultUploader: TOnFileDrop = useCallback(
-		(droppedFiles: File[], dropTarget: any) => {
+	const defaultUploader = useCallback<TOnFileDrop>(
+		(droppedFiles, dropTarget) => {
 			const ModalBody = () => {
 				const label = (file: File) =>
 					`'${file.name}' of size '${file.size}' and type '${file.type}'`;
@@ -41,7 +39,7 @@ const useFileUploader = ({
 							<li key={file.name}>{label(file)}</li>
 						))}
 
-						{dropTarget ? (
+						{dropTarget && typeof dropTarget === 'object' ? (
 							<span>
 								Dropped on item{' '}
 
@@ -68,12 +66,9 @@ const useFileUploader = ({
 		[selectedItemsKey]
 	);
 
-	const handleFileDrop: THandleFileDrop = (
-		droppedItem: any,
-		dropTarget?: any
-	) => {
+	const handleFileDrop: THandleFileDrop = (droppedItem, dropTarget) => {
 		if (droppedItem) {
-			const files: File[] = droppedItem.files;
+			const files = droppedItem.files;
 			setDroppedFiles(files);
 			setDropTarget(dropTarget ? dropTarget : null);
 		}

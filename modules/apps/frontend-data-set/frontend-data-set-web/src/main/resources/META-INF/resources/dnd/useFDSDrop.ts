@@ -11,7 +11,7 @@ import {
 	useEffect,
 	useRef,
 } from 'react';
-import {type DropTargetMonitor, useDrop} from 'react-dnd';
+import {useDrop} from 'react-dnd';
 import {NativeTypes} from 'react-dnd-html5-backend';
 
 import DnDContext from '../DnDContext';
@@ -50,10 +50,12 @@ const useFDSDrop = ({
 
 	const [{isOverCurrent}, dropRef] = useDrop({
 		accept: isFileDropEnabled(fileDropSettings) ? [NativeTypes.FILE] : [],
+
 		canDrop() {
 			return isFileDropEnabled(fileDropSettings) && isDropTarget(item);
 		},
-		collect: (monitor: DropTargetMonitor) => {
+
+		collect: (monitor) => {
 			return {
 				isOverCurrent:
 					isFileDropEnabled(fileDropSettings) &&
@@ -61,7 +63,8 @@ const useFDSDrop = ({
 					monitor.isOver({shallow: true}),
 			};
 		},
-		drop(fileItem: any, monitor) {
+
+		drop(fileItem: {files: File[]; type: never}, monitor) {
 			if (monitor.isOver({shallow: true})) {
 				if (targetDropRefQuerySelector && targetDropElementRef) {
 					targetDropElementRef.current?.classList.remove(
