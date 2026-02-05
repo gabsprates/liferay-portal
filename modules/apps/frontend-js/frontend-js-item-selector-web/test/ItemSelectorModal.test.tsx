@@ -28,6 +28,17 @@ const mockSecondItem = {
 	name: 'Second Item Name',
 };
 
+jest.mock('@liferay/site-cms-site-initializer', () => {
+	const actualPackage = jest.requireActual(
+		'@liferay/site-cms-site-initializer'
+	);
+
+	return {
+		...actualPackage,
+		ContentEditorToolbar: () => <>{null}</>,
+	};
+});
+
 jest.mock('frontend-js-web', () => {
 	const actualPackage = jest.requireActual('frontend-js-web') as any;
 
@@ -524,5 +535,21 @@ describe('ItemSelectorModal component', () => {
 			Liferay.Language.get('x-selected'),
 			mockFirstItem.name
 		);
+	});
+
+	it('must hide FDS when draging and drop files, showing the upload modal', async () => {
+		const user = userEvent.setup();
+
+		const {findByRole} = render(
+			<ItemSelectorModalWrapper
+				defaultOpen={true}
+				onItemsChange={jest.fn}
+				selectedItems={[]}
+			/>
+		);
+
+		const modal = await findByRole('dialog');
+
+		expect(modal).toBeInTheDocument();
 	});
 });

@@ -11,11 +11,15 @@ import {InternalDispatch} from '@clayui/shared';
 import {
 	ACTION_ITEM_TARGETS,
 	FrontendDataSet,
+	IFileDropSettings,
 	IFrontendDataSetProps,
 } from '@liferay/frontend-data-set-web';
+import {FileData} from '@liferay/site-cms-site-initializer';
 import classNames from 'classnames';
 import {getObjectValueFromPath, sub} from 'frontend-js-web';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+
+import MultipleFileUploaderWrapper from './MultipleFilesUploaderWrapper';
 
 type IItemSelectorModalFDSProps = Omit<
 	IFrontendDataSetProps,
@@ -144,6 +148,8 @@ function ItemSelectorModal<T extends Record<string, any>>({
 	title,
 }: IItemSelectorModalProps<T>) {
 	const [selectedItems, setSelectedItems] = useState(externalItems);
+	const [view, setViewType] = useState<'fds' | 'upload'>('fds');
+	const [filesToUpload, setFilesToUpload] = useState<FileData[]>([]);
 
 	useEffect(() => {
 		if (!open) {
@@ -160,7 +166,32 @@ function ItemSelectorModal<T extends Record<string, any>>({
 
 	const hasSelectedItems = !!selectedItems.length;
 
-	return open ? (
+	const fileDropSettings = useMemo<IFileDropSettings>(() => {
+		return {
+			enabled: true,
+			isDropTarget: () => {
+				return false;
+			},
+			onFileDrop: (files) => {
+				setFilesToUpload(
+					files.map((file) => ({
+						errorMessage: '',
+						failed: false,
+						file,
+						name: file.name,
+						size: file.size,
+					}))
+				);
+				setViewType('upload');
+			},
+		};
+	}, []);
+
+	if (!open) {
+		return <></>;
+	}
+
+	return (
 		<ClayModal observer={observer} size="full-screen">
 			<ClayModal.Header
 				closeButtonAriaLabel={Liferay.Language.get('close')}
@@ -172,118 +203,142 @@ function ItemSelectorModal<T extends Record<string, any>>({
 
 			{message}
 
-			<ClayModal.Body className="p-0">
-				{breadcrumbs && (
-					<ClayLayout.Container fluid>
-						{breadcrumbsLabel && (
-							<h2 className="mb-0 mt-2">
-								{breadcrumbs[breadcrumbs.length - 1].label}
-							</h2>
-						)}
+			<ClayModal.Body className="d-flex flex-column p-0">
+				<ClayLayout.Container
+					className={classNames({'d-none': view !== 'fds'})}
+					fluid
+				>
+					{breadcrumbs && (
+						<ClayLayout.Container fluid>
+							{breadcrumbsLabel && (
+								<h2 className="mb-0 mt-2">
+									{breadcrumbs[breadcrumbs.length - 1].label}
+								</h2>
+							)}
 
-						<ClayBreadcrumb
-							items={breadcrumbs.map((breadcrumb, index) => ({
-								...breadcrumb,
-								active: index === breadcrumbs.length - 1,
-							}))}
-						/>
-					</ClayLayout.Container>
+							<ClayBreadcrumb
+								items={breadcrumbs.map((breadcrumb, index) => ({
+									...breadcrumb,
+									active: index === breadcrumbs.length - 1,
+								}))}
+							/>
+						</ClayLayout.Container>
+					)}
+
+					<FrontendDataSet
+						{...fdsProps}
+						apiURL={apiURL}
+						creationMenu={
+							createItemURL
+								? {
+										primaryItems: [
+											{
+												href: createItemURL,
+												label: Liferay.Language.get(
+													'add-new-item'
+												),
+												target: ACTION_ITEM_TARGETS.BLANK,
+											},
+										],
+									}
+								: undefined
+						}
+						emptyState={
+							fdsProps.emptyState ||
+							(createItemURL ? EMPTY_STATE_PROPS : undefined)
+						}
+						fileDropSettings={fileDropSettings}
+						onSelectedItemsChange={setSelectedItems}
+						selectedItems={selectedItems}
+						selectedItemsKey={locator.id}
+						selectionType={multiSelect ? 'multiple' : 'single'}
+						showNavBarWhenSelected={true}
+						style="fluid"
+					/>
+				</ClayLayout.Container>
+
+				{view === 'upload' && (
+					<MultipleFileUploaderWrapper
+						files={filesToUpload}
+						onCloseUploadView={() => {
+							setViewType('fds');
+							setFilesToUpload([]);
+						}}
+					/>
 				)}
-
-				<FrontendDataSet
-					{...fdsProps}
-					apiURL={apiURL}
-					creationMenu={
-						createItemURL
-							? {
-									primaryItems: [
-										{
-											href: createItemURL,
-											label: Liferay.Language.get(
-												'add-new-item'
-											),
-											target: ACTION_ITEM_TARGETS.BLANK,
-										},
-									],
-								}
-							: undefined
-					}
-					emptyState={createItemURL ? EMPTY_STATE_PROPS : undefined}
-					onSelectedItemsChange={setSelectedItems}
-					selectedItems={selectedItems}
-					selectedItemsKey={locator.id}
-					selectionType={multiSelect ? 'multiple' : 'single'}
-					showNavBarWhenSelected={true}
-					style="fluid"
-				/>
 			</ClayModal.Body>
 
-			<ClayModal.Footer
-				className={classNames({
-					'bg-primary-l3 border-primary border-top': hasSelectedItems,
-				})}
-				first={
-					hasSelectedItems ? (
-						<div className="align-items-center d-flex">
-							{selectedItems.length > 1
-								? sub(
-										Liferay.Language.get(
-											'x-items-selected'
-										),
-										selectedItems.length
-									)
-								: sub(
-										Liferay.Language.get('x-selected'),
-										getSelectedItemLabel(selectedItems[0])
-									)}
+			{view === 'fds' && (
+				<ClayModal.Footer
+					className={classNames({
+						'bg-primary-l3 border-primary border-top':
+							hasSelectedItems,
+					})}
+					first={
+						hasSelectedItems ? (
+							<div className="align-items-center d-flex">
+								{selectedItems.length > 1
+									? sub(
+											Liferay.Language.get(
+												'x-items-selected'
+											),
+											selectedItems.length
+										)
+									: sub(
+											Liferay.Language.get('x-selected'),
+											getSelectedItemLabel(
+												selectedItems[0]
+											)
+										)}
 
+								<ClayButton
+									className="ml-3 text-secondary"
+									displayType="link"
+									onClick={() => {
+										setSelectedItems([]);
+									}}
+								>
+									<strong>
+										{Liferay.Language.get('clear')}
+									</strong>
+								</ClayButton>
+							</div>
+						) : undefined
+					}
+					last={
+						<ClayButton.Group spaced>
 							<ClayButton
-								className="ml-3 text-secondary"
-								displayType="link"
+								className="btn-cancel"
+								displayType="secondary"
 								onClick={() => {
 									setSelectedItems([]);
+
+									onOpenChange(false);
 								}}
 							>
-								<strong>{Liferay.Language.get('clear')}</strong>
+								{Liferay.Language.get('cancel')}
 							</ClayButton>
-						</div>
-					) : undefined
-				}
-				last={
-					<ClayButton.Group spaced>
-						<ClayButton
-							className="btn-cancel"
-							displayType="secondary"
-							onClick={() => {
-								setSelectedItems([]);
 
-								onOpenChange(false);
-							}}
-						>
-							{Liferay.Language.get('cancel')}
-						</ClayButton>
+							<ClayButton
+								className="item-preview selector-button"
+								disabled={!hasSelectedItems}
+								onClick={() => {
+									onItemsChange(
+										multiSelect
+											? selectedItems
+											: selectedItems.slice(0, 1)
+									);
 
-						<ClayButton
-							className="item-preview selector-button"
-							disabled={!hasSelectedItems}
-							onClick={() => {
-								onItemsChange(
-									multiSelect
-										? selectedItems
-										: selectedItems.slice(0, 1)
-								);
-
-								onOpenChange(false);
-							}}
-						>
-							{Liferay.Language.get('select')}
-						</ClayButton>
-					</ClayButton.Group>
-				}
-			/>
+									onOpenChange(false);
+								}}
+							>
+								{Liferay.Language.get('select')}
+							</ClayButton>
+						</ClayButton.Group>
+					}
+				/>
+			)}
 		</ClayModal>
-	) : (
-		<></>
 	);
 }
 

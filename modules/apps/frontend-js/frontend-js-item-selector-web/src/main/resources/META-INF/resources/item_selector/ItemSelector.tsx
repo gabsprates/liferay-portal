@@ -15,6 +15,7 @@ import {fetch, getObjectValueFromPath} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import ItemSelectorModal, {IItemSelectorModalProps} from './ItemSelectorModal';
+import {HeadlessPage} from './types';
 
 const NETWORK_STATUS_UNUSED = 4;
 
@@ -30,12 +31,6 @@ const getNextPageURL = ({apiURL, page}: {apiURL: string; page: number}) => {
 type ChildrenFunction<T, P> = P extends unknown[]
 	? (item: T, ...args: P) => React.ReactElement
 	: (item: T, index?: number) => React.ReactElement;
-
-interface HeadlessPage<T = unknown> {
-	items: T[];
-	lastPage: number;
-	page: number;
-}
 
 type IInternalItemSelectorModalProps<T> = Omit<
 	IItemSelectorModalProps<T>,

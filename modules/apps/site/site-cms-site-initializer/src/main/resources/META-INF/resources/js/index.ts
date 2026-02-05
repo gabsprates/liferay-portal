@@ -6,6 +6,8 @@
 export {default as Breadcrumb} from './common/components/Breadcrumb';
 export {default as SpaceSticker} from './common/components/SpaceSticker';
 export {default as Toolbar} from './common/components/Toolbar';
+export {default as ApiHelper} from './common/services/ApiHelper';
+export {type AssetLibrary} from './common/types/AssetLibrary';
 export {IAssetObjectEntry} from './common/types/AssetType';
 
 export {default as ContentEditorSidePanel} from './content_editor/components/ContentEditorSidePanel';
@@ -38,6 +40,10 @@ export {default as TransitionWorkflowStateModalContent} from './main_view/home/m
 export {default as UpdateDueDateModalContent} from './main_view/home/modal/UpdateDueDateModalContent';
 export {default as AssetTypeInfoPanelContent} from './main_view/info_panel/AssetTypeInfoPanelContent';
 export {default as AssetTags} from './main_view/info_panel/components/AssetTags';
+export {
+	default as MultipleFileUploader,
+	type FileData,
+} from './main_view/multiple_file_uploader/MultipleFileUploader';
 export {default as AllSpacesFDSPropsTransformer} from './main_view/props_transformer/AllSpacesFDSPropsTransformer';
 export {
 	default as AssetsFDSPropsTransformer,

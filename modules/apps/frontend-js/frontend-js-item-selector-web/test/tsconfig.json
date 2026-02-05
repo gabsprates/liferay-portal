@@ -1,5 +1,5 @@
 {
-	"@generated": "54c42a9f3e7bfd00433ae955aca619485886c1b9",
+	"@generated": "75d5cca995b4533b2803ed011b57557283590b2f",
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT **",
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
@@ -16,6 +16,9 @@
 			],
 			"@liferay/frontend-js-react-web": [
 				"../../frontend-js-react-web/src/main/resources/META-INF/resources/js/index.ts"
+			],
+			"@liferay/site-cms-site-initializer": [
+				"../../../site/site-cms-site-initializer/src/main/resources/META-INF/resources/js/index.ts"
 			],
 			"frontend-js-web": [
 				"../../frontend-js-web/src/main/resources/META-INF/resources/main/index.d.ts"
@@ -47,6 +50,9 @@
 		},
 		{
 			"path": "../../frontend-js-react-web/src/main/resources/META-INF/resources/tsconfig.json"
+		},
+		{
+			"path": "../../../site/site-cms-site-initializer/src/main/resources/META-INF/resources/tsconfig.json"
 		},
 		{
 			"path": "../../frontend-js-web/src/main/resources/META-INF/resources/tsconfig.json"

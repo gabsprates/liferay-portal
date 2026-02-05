@@ -8,7 +8,7 @@ import ClayButton from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayList from '@clayui/list';
 import {useModal} from '@clayui/modal';
-import ClaySticker from '@clayui/sticker';
+import ClaySticker, {DisplayType} from '@clayui/sticker';
 import {IFrontendDataSetProps} from '@liferay/frontend-data-set-web';
 import {
 	ItemSelector,
@@ -27,8 +27,6 @@ import {
 	EItemSelectorModalViewsConfig,
 	getDefaultItemSelectorModalViews,
 } from './utils/getDefaultItemSelectorModalViews';
-
-import type {DisplayType} from '@clayui/sticker';
 
 function SampleContainer({
 	children,
@@ -464,6 +462,21 @@ export default function ItemSelectorSamples() {
 
 			<SampleContainer label="Item Selector Modal">
 				<CMSFilesItemSelectorModal
+					fdsProps={{
+						...FDS_DEFAULT_PROPS,
+						emptyState: {
+							description: Liferay.Language.get(
+								'click-new-or-drag-and-drop-your-files-here'
+							),
+							image: '/states/cms_empty_state_files.svg',
+							title: Liferay.Language.get('no-files-yet'),
+						},
+						id: `itemSelectorModal-cms-file-${getRandomId()}`,
+						views: getDefaultItemSelectorModalViews({
+							viewsConfig:
+								EItemSelectorModalViewsConfig.ASSET_LIBRARIES,
+						}),
+					}}
 					items={cmsFiles}
 					multiSelect
 					observer={cmsFilesItemSelectorObserver}
