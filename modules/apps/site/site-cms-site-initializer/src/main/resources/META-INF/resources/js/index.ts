@@ -13,6 +13,7 @@ export {default as FieldWrapper} from './common/components/forms/FieldWrapper';
 export {required, validate} from './common/components/forms/validations';
 export {default as ApiHelper, RequestResult} from './common/services/ApiHelper';
 export {IAssetObjectEntry} from './common/types/AssetType';
+export {type Space} from './common/types/Space';
 export {
 	IBulkActionFDSData,
 	IBulkActionTaskStarterDTO,
