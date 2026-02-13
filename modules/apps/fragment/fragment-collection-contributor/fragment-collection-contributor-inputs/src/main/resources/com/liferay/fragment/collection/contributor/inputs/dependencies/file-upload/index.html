@@ -4,6 +4,14 @@
 	showDocumentLibrarySelector = input.attributes.selectFromDocumentLibrary?? && input.attributes.selectFromDocumentLibrary
 ]
 
+<pre style="text-wrap: auto;word-wrap: break-word;">
+	${ jsonFactoryUtil.looseSerializeDeep(input) }
+</pre>
+
+<pre style="text-wrap: auto;word-wrap: break-word;">
+	${ jsonFactoryUtil.looseSerializeDeep(input.attributes) }
+</pre>
+
 [#if input.value?? && !showDocumentLibrarySelector]
 	[#assign localFileUploaded = true]
 [/#if]
