@@ -95,3 +95,7 @@ export {default as mimeTypeUtils} from './utils/mime_type/index';
 export {getObjectValueFromPath} from './utils/object/getObjectValueFromPath';
 export {default as pkceChallenge} from './utils/pkceChallenge';
 export {getFileAsBase64} from './utils/string/getFileAsBase64';
+
+export function doTest() {
+	return 1 + 1;
+}
