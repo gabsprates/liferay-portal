@@ -67,3 +67,72 @@ test('Can navigate to Design Libraries page', async ({
 		page.getByRole('button', {name: 'New Design Library'})
 	).toBeVisible();
 });
+
+test('Can navigate to a Design Library dashboard', async ({
+	designLibrariesPage,
+	page,
+}) => {
+	const designLibraryName = /^A Design Library/;
+
+	await test.step('Navigate to a Design Library dashboard', async () => {
+		await designLibrariesPage.goto();
+
+		await expect(page.getByTestId('header')).toHaveText('Design Libraries');
+
+		const designLibraryLink = page.getByRole('link', {
+			name: designLibraryName,
+		});
+
+		await designLibraryLink.click();
+	});
+
+	await test.step('Check dashboard elements', async () => {
+		const breadcrumb = page.getByRole('navigation', {name: 'Breadcrumb'});
+
+		await expect(breadcrumb).toBeVisible();
+
+		const links = breadcrumb.getByRole('link');
+
+		expect(await links.count()).toEqual(2);
+
+		expect(links.first()).toHaveText('Design Libraries');
+
+		expect(links.last()).toHaveText(designLibraryName);
+
+		const moreActionsButton = page.getByRole('button', {
+			name: 'More Actions',
+		});
+
+		await moreActionsButton.click();
+
+		await expect(page.getByRole('menu')).toBeVisible();
+
+		await expect(
+			page.getByRole('menu').getByRole('menuitem', {name: 'Settings'})
+		).toBeVisible();
+
+		await expect(
+			page
+				.getByRole('menu')
+				.getByRole('menuitem', {name: 'Connected Sites'})
+		).toBeVisible();
+
+		await expect(
+			page
+				.getByRole('menu')
+				.getByRole('menuitem', {name: 'Manage Members'})
+		).toBeVisible();
+
+		await expect(
+			page.getByRole('menu').getByRole('menuitem', {name: 'Import'})
+		).toBeVisible();
+
+		await expect(
+			page.getByRole('menu').getByRole('menuitem', {name: 'Export'})
+		).toBeVisible();
+
+		await expect(
+			page.getByRole('menu').getByRole('menuitem', {name: 'Delete'})
+		).toBeVisible();
+	});
+});
