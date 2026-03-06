@@ -48,3 +48,22 @@ test('Check if Design Library is working correctly', async ({
 		).toBeVisible();
 	});
 });
+
+test('Can navigate to Design Libraries page', async ({
+	designLibrariesPage,
+	page,
+}) => {
+	await designLibrariesPage.goto();
+
+	await expect(page.getByTestId('header')).toHaveText('Design Libraries');
+
+	await expect(page.getByText('No Design Libraries Yet')).toBeVisible();
+
+	await expect(
+		page.getByText('Click "New" to create your first Design Library.')
+	).toBeVisible();
+
+	await expect(
+		page.getByRole('button', {name: 'New Design Library'})
+	).toBeVisible();
+});
