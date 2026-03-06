@@ -29,6 +29,12 @@ DesignLibraryDashboardDisplayContext designLibraryDashboardDisplayContext = new 
 		font-size: var(--font-size-lg);
 	}
 }
+
+.design-library-dashboard-fds {
+	.management-bar-wrapper, .data-set-content-wrapper:not(:has(.c-empty-state)) {
+		background: var(--white);
+	}
+}
 </style>
 
 <div>
@@ -40,6 +46,12 @@ DesignLibraryDashboardDisplayContext designLibraryDashboardDisplayContext = new 
 	</div>
 
 	<div class="design-library-dashboard-fds">
+		<frontend-data-set:headless-display
+			apiURL="<%= designLibraryDashboardDisplayContext.getAPIURL() %>"
+			emptyState="<%= designLibraryDashboardDisplayContext.getEmptyState() %>"
+			formName="fm"
 			id="<%= String.valueOf(designLibraryId) %>"
+			propsTransformer="{DesignLibraryDashboardFDSPropsTransformer} from design-library-web"
+		/>
 	</div>
 </div>
