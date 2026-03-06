@@ -13,4 +13,6 @@ public class DesignLibraryConstants {
 	public static final String BUNDLE_SYMBOLIC_NAME =
 		"com.liferay.design.library.web";
 
+	public static final String DESIGN_LIBRARY_ENTRY_ID_KEY =
+		"DESIGN_LIBRARY_ENTRY_ID_KEY";
 }
