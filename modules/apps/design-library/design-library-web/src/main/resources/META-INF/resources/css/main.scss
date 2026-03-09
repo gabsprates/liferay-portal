@@ -1,0 +1,12 @@
+.design-library-breadcrumb {
+	.breadcrumb-item {
+		font-size: var(--font-size-lg);
+	}
+}
+
+.design-library-dashboard-fds {
+	.management-bar-wrapper,
+	.data-set-content-wrapper:not(:has(.c-empty-state)) {
+		background: var(--white);
+	}
+}
