@@ -13,7 +13,7 @@ ViewDesignLibraryAdminDisplayContext viewDesignLibraryAdminDisplayContext = new 
 String designLibraryEntryName = "A Design Library";
 %>
 
-<div>
+<div class="design-library-fds-wrapper">
 	<frontend-data-set:headless-display
 		apiURL="<%= viewDesignLibraryAdminDisplayContext.getAPIURL() %>"
 		emptyState="<%= viewDesignLibraryAdminDisplayContext.getEmptyState() %>"

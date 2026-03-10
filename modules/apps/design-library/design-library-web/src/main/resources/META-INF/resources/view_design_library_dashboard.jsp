@@ -23,7 +23,7 @@ DesignLibraryDashboardDisplayContext designLibraryDashboardDisplayContext = new 
 		/>
 	</div>
 
-	<div class="design-library-dashboard-fds">
+	<div class="design-library-fds-wrapper">
 		<frontend-data-set:headless-display
 			apiURL="<%= designLibraryDashboardDisplayContext.getAPIURL() %>"
 			emptyState="<%= designLibraryDashboardDisplayContext.getEmptyState() %>"
