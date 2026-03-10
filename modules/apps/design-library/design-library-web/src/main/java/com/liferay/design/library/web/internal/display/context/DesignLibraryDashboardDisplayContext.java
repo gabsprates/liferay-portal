@@ -5,12 +5,16 @@
 
 package com.liferay.design.library.web.internal.display.context;
 
-import com.liferay.design.library.web.internal.constants.DesignLibraryAdminPortletKeys;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
+import com.liferay.portal.kernel.util.WebKeys;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Map;
@@ -24,13 +28,14 @@ public class DesignLibraryDashboardDisplayContext {
 		HttpServletRequest httpServletRequest) {
 
 		_httpServletRequest = httpServletRequest;
+
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 	}
 
 	public String getAPIURL() {
-		return "http://localhost:8080/o/search/v1.0/search"
-			+ "?page=1"
-			+ "&pageSize=20"
-			+ "&emptySearch=true"
+		return "/o/search/v1.0/search?page=1&pageSize=20&emptySearch=true"
 			+ "&filter=cmsRoot eq true and cmsSection eq 'files' and status in (0, 2, 3, 1, 7)"
 			+ "&nestedFields=embedded,embeddedTaxonomyCategory,file.metadata,file.previewURL,file.thumbnailURL,numberOfObjectEntries,numberOfObjectEntryFolders,systemProperties.objectDefinitionBrief";
 	}
@@ -50,6 +55,8 @@ public class DesignLibraryDashboardDisplayContext {
 	}
 
 	public Map<String, Object> getHeaderProps(long designLibraryEntryId) {
+		DepotEntry designLibraryDepotEntry = DepotEntryLocalServiceUtil.fetchDepotEntry(designLibraryEntryId);
+
 		return HashMapBuilder.<String, Object>put(
 			"actionItems", () -> {
 				JSONArray jsonArray = JSONUtil.putAll();
@@ -113,12 +120,41 @@ public class DesignLibraryDashboardDisplayContext {
 				return jsonArray;
 			}
 		).put(
-			"portletRoot", DesignLibraryAdminPortletKeys.DESIGN_LIBRARY_ADMIN
-		).put(
-			"title", "A Design Library " + (designLibraryEntryId)
+			"breadcrumbProps", () -> {
+				HashMapBuilder.HashMapWrapper<String, Object> propsHashMap = HashMapBuilder.put(
+					"redirect", HashMapBuilder.<String,Object>put(
+						"active", false
+					).put(
+						"href", _themeDisplay.getPortletDisplay().getURLBack()
+					).put(
+						"label", LanguageUtil.get(_httpServletRequest, "design-libraries")
+					).build()
+				);
+
+				try {
+					Group group = designLibraryDepotEntry.getGroup();
+
+					propsHashMap.put(
+						"current", HashMapBuilder.<String,Object>put(
+							"active", true
+						).put(
+							"href", null
+						).put(
+							"label", group.getName(_httpServletRequest.getLocale())
+						).build()
+					);
+
+					return propsHashMap.build();
+				}
+				catch (Exception exception) {
+					return propsHashMap.build();
+				}
+			}
 		).build();
 	}
 
 	private final HttpServletRequest _httpServletRequest;
+
+	private final ThemeDisplay _themeDisplay;
 
 }
