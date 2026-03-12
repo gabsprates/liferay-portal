@@ -14,5 +14,6 @@ public class DesignLibraryConstants {
 		"com.liferay.design.library.web";
 
 	public static final String DESIGN_LIBRARY_ENTRY_ID_KEY =
-		"DESIGN_LIBRARY_ENTRY_ID_KEY";
+		"designLibraryEntryId";
+
 }
