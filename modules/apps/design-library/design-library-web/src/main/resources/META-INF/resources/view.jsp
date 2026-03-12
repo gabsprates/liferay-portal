@@ -8,26 +8,16 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ViewDesignLibraryAdminDisplayContext viewDesignLibraryAdminDisplayContext = new ViewDesignLibraryAdminDisplayContext(request);
-
-String designLibraryEntryName = "A Design Library";
+ViewDesignLibraryAdminDisplayContext viewDesignLibraryAdminDisplayContext = new ViewDesignLibraryAdminDisplayContext(request, liferayPortletResponse);
 %>
 
 <div class="design-library-fds-wrapper">
 	<frontend-data-set:headless-display
+		additionalProps="<%= viewDesignLibraryAdminDisplayContext.getFDSAdditionalProps() %>"
 		apiURL="<%= viewDesignLibraryAdminDisplayContext.getAPIURL() %>"
 		emptyState="<%= viewDesignLibraryAdminDisplayContext.getEmptyState() %>"
 		formName="fm"
 		id="<%= DesignLibraryAdminFDSNames.ALL_DESIGN_LIBRARIES_SECTION %>"
 		propsTransformer="{DesignLibraryAdminFDSPropsTransformer} from design-library-web"
 	/>
-</div>
-
-<div>
-	<portlet:renderURL var="designLibraryURL">
-		<portlet:param name="mvcRenderCommandName" value="/design_library/view_design_library_dashboard" />
-		<portlet:param name="designLibraryEntryId" value="1234567890" />
-	</portlet:renderURL>
-
-	<a href="<%= designLibraryURL %>"><%= designLibraryEntryName %></a>
 </div>

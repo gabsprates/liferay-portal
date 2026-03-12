@@ -1,3 +1,5 @@
+@import 'atlas-variables';
+
 .design-library-breadcrumb {
 	.breadcrumb-item {
 		font-size: var(--font-size-lg);
@@ -8,5 +10,10 @@
 	.management-bar-wrapper,
 	.data-set-content-wrapper:not(:has(.c-empty-state)) {
 		background: var(--white);
+	}
+
+	.design-library-fds-sticker-books {
+		background-color: $teal-l3;
+		color: $teal;
 	}
 }
