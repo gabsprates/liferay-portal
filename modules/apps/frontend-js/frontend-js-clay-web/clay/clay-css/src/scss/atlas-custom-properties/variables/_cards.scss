@@ -6,7 +6,7 @@ $card-border-color: var(
 $card-border-style: var(--card-border-style, solid) !default;
 $card-border-width: var(--card-border-width, 0px) !default;
 
-$card-border-radius: var(--card-border-radius, $border-radius) !default;
+$card-border-radius: var(--card-border-radius, $border-radius-xl) !default;
 $card-inner-border-radius: calc(
 	#{$card-border-radius} - #{$card-border-width}
 ) !default;
