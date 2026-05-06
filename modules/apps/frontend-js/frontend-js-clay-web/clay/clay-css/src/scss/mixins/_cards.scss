@@ -1961,6 +1961,8 @@
 
 			@if ($_hover) {
 				&:hover {
+					@include clay-css($_hover);
+
 					$_card: map-get($_hover, card);
 
 					@if ($_card) {
