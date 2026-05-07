@@ -102,7 +102,6 @@ $form-check-card: map-deep-merge(
 		transition: transform 0.15s ease-in-out,
 
 		hover: (
-			transform: translateY(-0.75rem),
 			card: (
 				border-color: $primary-l1,
 				box-shadow: $card-box-shadow,
@@ -111,6 +110,8 @@ $form-check-card: map-deep-merge(
 				outline-width: $border-width,
 				transform: none,
 			),
+
+			transform: translateY(-0.75rem),
 		),
 
 		active: (
@@ -167,8 +168,23 @@ $card-interactive: map-deep-merge(
 		active: (
 			background-color: #f1f2f5,
 		),
+
+		after-highlight: null,
 	),
 	$card-interactive
+);
+
+// Card Interactive Primary
+
+$card-interactive-primary: () !default;
+$card-interactive-primary: map-deep-merge(
+	(
+		hover: (
+			box-shadow:
+				'#{$card-box-shadow}, 0px -2.5rem 0px -2.25rem #{$primary} inset',
+		),
+	),
+	$card-interactive-primary
 );
 
 // Card Interactive Secondary
@@ -177,13 +193,13 @@ $card-interactive-secondary: () !default;
 $card-interactive-secondary: map-deep-merge(
 	(
 		hover: (
-			border-color: transparent,
-			box-shadow: 0 0 0 2px $primary-l0,
+			border-color: null,
+			box-shadow: null,
 		),
 
 		focus: (
-			border-color: transparent,
-			box-shadow: 0 0 0 2px $primary-l0,
+			border-color: null,
+			box-shadow: null,
 		),
 	),
 	$card-interactive-secondary

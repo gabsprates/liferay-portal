@@ -487,7 +487,8 @@
 		);
 	}
 
-	&:has(.custom-control-input:is(:disabled, .disabled)):hover .card {
+	&:not(.active):has(.custom-control-input:is(:disabled, .disabled)):hover
+		.card {
 		border-color: $secondary-l2;
 		outline: none;
 	}
