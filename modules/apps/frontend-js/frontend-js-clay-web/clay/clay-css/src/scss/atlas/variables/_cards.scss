@@ -25,6 +25,7 @@ $card: map-deep-merge(
 		border-width: $card-border-width,
 		box-shadow: none,
 		transition: clay-enable-transitions($card-transition),
+
 		hover: (
 			box-shadow: $card-box-shadow,
 			transform: translateY(-0.75rem),
