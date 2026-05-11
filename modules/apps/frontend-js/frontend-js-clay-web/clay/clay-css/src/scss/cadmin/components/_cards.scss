@@ -351,10 +351,18 @@
 		position: static;
 	}
 
-	&:not(.active):has(.custom-control-input:is(:disabled, .disabled)):hover
+	&.active .card,
+	.custom-control-input:checked ~ .card,
+	.form-check-input:checked ~ .card {
+		box-shadow: $cadmin-form-check-card-checked-box-shadow;
+	}
+}
+
+.form-check-card {
+	&:hover {
 		.card {
-		border-color: $cadmin-secondary-l2;
-		outline: none;
+			box-shadow: $cadmin-form-check-card-checked-box-shadow;
+		}
 	}
 }
 
