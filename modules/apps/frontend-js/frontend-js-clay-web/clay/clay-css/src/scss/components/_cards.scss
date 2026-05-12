@@ -486,6 +486,18 @@
 			)
 		);
 	}
+
+	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) .card {
+		@include clay-card-variant(
+			map-deep-get(
+				$form-check-card,
+				custom-control,
+				custom-control-input,
+				disabled,
+				card
+			)
+		);
+	}
 }
 
 .form-check-bottom-left,
