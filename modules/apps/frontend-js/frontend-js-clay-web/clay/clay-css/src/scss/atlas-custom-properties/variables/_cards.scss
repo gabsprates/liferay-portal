@@ -1,20 +1,22 @@
 $card-bg: var(--card-bg, $white) !default;
 $card-border-color: var(
 	--card-border-color,
-	unquote('hsl(from #{$black} h s l / 0.125)')
+	unquote('hsl(from #{$secondary-l2} h s l / 0.125)')
 ) !default;
-$card-border-style: var(--card-border-style, solid) !default;
-$card-border-width: var(--card-border-width, 0px) !default;
-
 $card-border-radius: var(--card-border-radius, $border-radius-xl) !default;
+$card-border-style: var(--card-border-style, solid) !default;
+$card-border-width: var(--card-border-width, 1px) !default;
+
+$card-box-shadow: var(--card-box-shadow, none) !default;
+$card-hover-box-shadow: var(
+	--card-hover-box-shadow,
+	0 0.25rem 0.75rem -0.25rem unquote('hsl(from #{$black} h s l / 0.25)')
+) !default;
+
 $card-inner-border-radius: calc(
 	#{$card-border-radius} - #{$card-border-width}
 ) !default;
 
-$card-box-shadow: var(
-	--card-box-shadow,
-	0 1px 3px -1px rgba(0, 0, 0, 0.6)
-) !default;
 $card-color: var(--card-color, inherit) !default;
 $card-height: null !default;
 $card-margin-bottom: var(--card-margin-bottom, 24px) !default;
@@ -24,6 +26,10 @@ $card-spacer-y: var(--card-spacer-y, 12px) !default;
 
 $card-cap-bg: unquote('hsl(from #{$black} h s l / 0.03)') !default;
 $card-cap-color: null !default;
+
+$card-transitions:
+	$component-transition,
+	transform 0.15s ease-in-out !default;
 
 // .card-body
 
@@ -186,12 +192,15 @@ $card: map-deep-merge(
 		border-radius: clay-enable-rounded($card-border-radius),
 		border-style: $card-border-style,
 		border-width: $card-border-width,
-		box-shadow: clay-enable-shadows($card-box-shadow),
 		display: block,
 		height: $card-height,
 		margin-bottom: $card-margin-bottom,
 		min-width: 0,
+		outline-color: transparent,
+		outline-style: solid,
+		outline-width: $card-border-width,
 		position: relative,
+		transition: $card-transitions,
 		word-wrap: break-word,
 
 		aspect-ratio: (
@@ -215,6 +224,10 @@ $card: map-deep-merge(
 		hr: (
 			margin-left: 0,
 			margin-right: 0,
+		),
+
+		hover: (
+			box-shadow: clay-enable-shadows($card-hover-box-shadow),
 		),
 	),
 	$card
@@ -399,14 +412,9 @@ $checkbox-right-card-padding: var(
 
 $checkbox-position: var(--checkbox-position, 16px) !default;
 
-$form-check-card-checked-box-shadow: var(
-	--form-check-card-checked-box-shadow,
-	0 0 0 2px unquote('hsl(from #{$component-active-bg} h s calc(l + 22.94))')
-) !default;
-
 // .form-check-card
 
-$form-check-card-checked-box-shadow: $input-btn-focus-box-shadow !default;
+$form-check-card-checked-box-shadow: c-unset !default;
 
 $form-check-card: () !default;
 $form-check-card: map-deep-merge(
@@ -417,19 +425,22 @@ $form-check-card: map-deep-merge(
 
 		hover: (
 			card: (
-				box-shadow: $form-check-card-checked-box-shadow,
+				border-color: $primary-l1,
+				outline-color: $primary-l1,
 			),
 		),
 
 		active: (
 			card: (
-				box-shadow: $form-check-card-checked-box-shadow,
+				border-color: $primary,
+				outline-color: $primary,
 			),
 		),
 
 		checked: (
 			card: (
-				box-shadow: $form-check-card-checked-box-shadow,
+				border-color: $primary,
+				outline-color: $primary,
 			),
 		),
 
@@ -472,9 +483,11 @@ $form-check-card: map-deep-merge(
 			custom-control-input: (
 				z-index: 2,
 
-				checked: (
+				disabled: (
 					card: (
-						box-shadow: $form-check-card-checked-box-shadow,
+						box-shadow: none,
+						border-color: $card-border-color,
+						outline: none,
 					),
 				),
 			),
@@ -760,8 +773,8 @@ $card-interactive: () !default;
 $card-interactive: map-deep-merge(
 	(
 		cursor: $link-cursor,
-		outline: 0,
-		transition: $component-transition,
+		outline: c-unset,
+		transition: $card-transitions,
 
 		hover: (
 			background-color: #f7f8f9,
@@ -769,15 +782,19 @@ $card-interactive: map-deep-merge(
 		),
 
 		focus: (
-			box-shadow: #{0 0 0 2px #fff,
-			0 0 0 4px #719aff},
+			border-color: $primary-l1,
+			box-shadow: none,
+			outline-color: $primary-l1,
+			outline-offset: 0,
+			outline-style: solid,
+			outline-width: $card-border-width,
 		),
 
 		active: (
 			background-color: #f1f2f5,
 		),
 
-		after-highlight: $card-interactive-after-highlight,
+		after-highlight: c-unset,
 
 		card-body: $card-interactive-card-body,
 	),
@@ -807,15 +824,18 @@ $card-interactive-primary-after-highlight: map-deep-merge(
 $card-interactive-primary: () !default;
 $card-interactive-primary: map-deep-merge(
 	(
+		hover: (
+			box-shadow: $card-interactive-primary-box-shadow,
+		),
+
 		focus: (
-			background-color: $gray-100,
+			box-shadow: $card-interactive-primary-box-shadow,
 		),
 
 		active: (
-			background-color: $gray-200,
+			box-shadow: $card-interactive-primary-box-shadow,
 		),
-
-		after-highlight: $card-interactive-primary-after-highlight,
+		after-highlight: c-unset,
 	),
 	$card-interactive-primary
 );
@@ -830,13 +850,13 @@ $card-interactive-secondary: map-deep-merge(
 		hover: (
 			background-color: $white,
 			border-color: transparent,
-			box-shadow: 0 0 0 2px #719aff,
+			box-shadow: $card-hover-box-shadow,
 			color: $gray-900,
 		),
 
 		focus: (
 			border-color: transparent,
-			box-shadow: 0 0 0 2px #719aff,
+			box-shadow: $card-hover-box-shadow,
 		),
 
 		active: (
