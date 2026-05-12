@@ -25,6 +25,10 @@
 	}
 }
 
+.card:not(:is(.card-horizontal, .template-card-horizontal)):hover {
+	transform: translateY(-0.25rem);
+}
+
 .card-body {
 	@include clay-css($cadmin-card-body);
 }
@@ -351,26 +355,27 @@
 		position: static;
 	}
 
+	&:hover .card {
+		border-color: $cadmin-primary-l1;
+		outline-color: $cadmin-primary-l1;
+	}
+
 	&.active .card,
 	.custom-control-input:checked ~ .card,
 	.form-check-input:checked ~ .card {
-		box-shadow: $cadmin-form-check-card-checked-box-shadow;
+		border-color: $cadmin-primary;
+		outline-color: $cadmin-primary;
 	}
-}
 
-.form-check-card {
-	&:hover {
+	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) {
 		.card {
-			box-shadow: $cadmin-form-check-card-checked-box-shadow;
+			box-shadow: none;
+			border-color: $cadmin-card-border-color;
+			outline: none;
 		}
-	}
-}
 
-.custom-control-input,
-.form-check-input {
-	&:hover {
-		~ .card {
-			box-shadow: $cadmin-form-check-card-checked-box-shadow;
+		&:hover .card {
+			transform: none;
 		}
 	}
 }
