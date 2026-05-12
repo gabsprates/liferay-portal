@@ -39,6 +39,10 @@
 	}
 }
 
+.card:not(:is(.card-horizontal, .template-card-horizontal)):hover {
+	transform: translateY(-0.25rem);
+}
+
 .card-body {
 	@include clay-css($card-body);
 }
@@ -487,16 +491,22 @@
 		);
 	}
 
-	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) .card {
-		@include clay-card-variant(
-			map-deep-get(
-				$form-check-card,
-				custom-control,
-				custom-control-input,
-				disabled,
-				card
-			)
-		);
+	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) {
+		&:hover .card {
+			transform: none;
+		}
+
+		.card {
+			@include clay-card-variant(
+				map-deep-get(
+					$form-check-card,
+					custom-control,
+					custom-control-input,
+					disabled,
+					card
+				)
+			);
+		}
 	}
 }
 
