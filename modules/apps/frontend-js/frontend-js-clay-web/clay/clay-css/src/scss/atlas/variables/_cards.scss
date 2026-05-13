@@ -3,7 +3,7 @@ $card-border-radius: $border-radius-xl !default;
 $card-border-width: $border-width !default;
 
 $card-box-shadow: c-unset !default;
-$card-hover-box-shadow: 0 0.25rem 0.75rem -0.25rem unquote('hsl(from #{$black} h s l / 0.25)') !default;
+$card-hover-box-shadow: 0 0.25rem 0.75rem -0.25rem unquote('rgb(from #{$black} r g b / 0.25)') !default;
 
 $card-body-padding-bottom: 1rem !default;
 $card-body-padding-left: 1rem !default;

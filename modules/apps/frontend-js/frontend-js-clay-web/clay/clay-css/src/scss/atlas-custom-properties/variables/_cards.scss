@@ -1,8 +1,5 @@
 $card-bg: var(--card-bg, $white) !default;
-$card-border-color: var(
-	--card-border-color,
-	unquote('hsl(from #{$secondary-l2} h s l / 0.125)')
-) !default;
+$card-border-color: var(--card-border-color, $secondary-l2) !default;
 $card-border-radius: var(--card-border-radius, $border-radius-xl) !default;
 $card-border-style: var(--card-border-style, solid) !default;
 $card-border-width: var(--card-border-width, 1px) !default;
@@ -820,6 +817,10 @@ $card-interactive-primary-after-highlight: map-deep-merge(
 	),
 	$card-interactive-primary-after-highlight
 );
+
+$card-interactive-primary-box-shadow: unquote(
+	'#{$card-hover-box-shadow}, 0px -2.5rem 0px -2.25rem #{$primary} inset'
+) !default;
 
 $card-interactive-primary: () !default;
 $card-interactive-primary: map-deep-merge(

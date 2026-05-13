@@ -162,7 +162,7 @@ $card: map-deep-merge(
 	(
 		background-color: $cadmin-card-bg,
 		border-color: $cadmin-card-border-color,
-		border-radius: clay-enable-rounded(l$cadmin-card-border-radius),
+		border-radius: clay-enable-rounded($cadmin-card-border-radius),
 		border-style: $cadmin-card-border-style,
 		border-width: $cadmin-card-border-width,
 		display: block,
