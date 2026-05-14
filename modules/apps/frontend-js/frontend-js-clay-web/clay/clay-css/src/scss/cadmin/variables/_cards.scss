@@ -1,7 +1,7 @@
 $cadmin-card-bg: $cadmin-white !default;
 $cadmin-card-border-color: $cadmin-secondary-l2 !default;
 $cadmin-card-border-style: solid !default;
-$cadmin-card-border-width: 0px !default;
+$cadmin-card-border-width: $cadmin-border-width !default;
 
 $cadmin-card-border-radius: $cadmin-border-radius-xl !default;
 $cadmin-card-inner-border-radius: calc(
