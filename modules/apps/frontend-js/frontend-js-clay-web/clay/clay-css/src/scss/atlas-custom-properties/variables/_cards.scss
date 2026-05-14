@@ -24,7 +24,7 @@ $card-spacer-y: var(--card-spacer-y, 12px) !default;
 $card-cap-bg: unquote('hsl(from #{$black} h s l / 0.03)') !default;
 $card-cap-color: null !default;
 
-$card-transitions:
+$card-transition:
 	$component-transition,
 	transform 0.15s ease-in-out !default;
 
@@ -197,7 +197,7 @@ $card: map-deep-merge(
 		outline-style: solid,
 		outline-width: $card-border-width,
 		position: relative,
-		transition: $card-transitions,
+		transition: $card-transition,
 		word-wrap: break-word,
 
 		aspect-ratio: (
@@ -771,7 +771,7 @@ $card-interactive: map-deep-merge(
 	(
 		cursor: $link-cursor,
 		outline: c-unset,
-		transition: $card-transitions,
+		transition: $card-transition,
 
 		hover: (
 			background-color: #f7f8f9,

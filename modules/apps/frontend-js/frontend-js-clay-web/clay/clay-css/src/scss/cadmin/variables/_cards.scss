@@ -21,7 +21,7 @@ $cadmin-card-spacer-y: 12px !default;
 $cadmin-card-cap-bg: rgba($cadmin-black, 0.03) !default;
 $cadmin-card-cap-color: null !default;
 
-$cadmin-card-transitions:
+$cadmin-card-transition:
 	$cadmin-component-transition,
 	transform 0.15s ease-in-out !default;
 // .card-body
@@ -173,7 +173,7 @@ $card: map-deep-merge(
 		outline-style: solid,
 		outline-width: $cadmin-card-border-width,
 		position: relative,
-		transition: $cadmin-card-transitions,
+		transition: $cadmin-card-transition,
 		word-wrap: break-word,
 
 		aspect-ratio: (
@@ -428,7 +428,7 @@ $cadmin-card-interactive: map-deep-merge(
 	(
 		cursor: $cadmin-link-cursor,
 		outline: c-unset,
-		transition: $cadmin-card-transitions,
+		transition: $cadmin-card-transition,
 
 		hover: (
 			background-color: #f7f8f9,

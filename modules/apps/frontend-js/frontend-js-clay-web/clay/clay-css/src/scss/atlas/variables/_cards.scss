@@ -14,7 +14,7 @@ $card-inner-border-radius: calc(
 	#{$card-border-radius} - #{$card-border-width}
 ) !default;
 
-$card-transitions:
+$card-transition:
 	$component-transition,
 	transform 0.15s ease-in-out !default;
 
@@ -28,7 +28,7 @@ $card: map-deep-merge(
 		outline-color: transparent,
 		outline-style: solid,
 		outline-width: $card-border-width,
-		transition: $card-transitions,
+		transition: $card-transition,
 
 		hover: (
 			box-shadow: clay-enable-shadows($card-hover-box-shadow),
@@ -145,7 +145,7 @@ $card-interactive: () !default;
 $card-interactive: map-deep-merge(
 	(
 		outline: c-unset,
-		transition: $card-transitions,
+		transition: $card-transition,
 
 		hover: (
 			background-color: #f7f8f9,
