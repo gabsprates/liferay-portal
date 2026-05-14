@@ -530,6 +530,12 @@ $cadmin-card-interactive-secondary: map-deep-merge(
 $cadmin-card-type-asset: () !default;
 $cadmin-card-type-asset: map-deep-merge(
 	(
+		transition: $cadmin-card-transition,
+
+		hover: (
+			transform: translateY(-0.25rem),
+		),
+
 		aspect-ratio: (
 			border-color: $cadmin-gray-300,
 			border-style: solid,
@@ -833,7 +839,13 @@ $cadmin-template-card-body: map-deep-merge(
 $cadmin-template-card: () !default;
 $cadmin-template-card: map-deep-merge(
 	(
+		transition: $cadmin-card-transition,
+
 		card-body: $cadmin-template-card-body,
+
+		hover: (
+			transform: translateY(-0.25rem),
+		),
 	),
 	$cadmin-template-card
 );

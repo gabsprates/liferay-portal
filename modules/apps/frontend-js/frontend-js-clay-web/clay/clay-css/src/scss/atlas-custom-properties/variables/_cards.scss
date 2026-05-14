@@ -872,6 +872,12 @@ $card-interactive-secondary: map-deep-merge(
 $card-type-asset: () !default;
 $card-type-asset: map-deep-merge(
 	(
+		transition: $card-transition,
+
+		hover: (
+			transform: translateY(-0.25rem),
+		),
+
 		aspect-ratio: (
 			border-color: $gray-300,
 			border-style: solid,
@@ -1175,7 +1181,13 @@ $template-card-body: map-deep-merge(
 $template-card: () !default;
 $template-card: map-deep-merge(
 	(
+		transition: $card-transition,
+
 		card-body: $template-card-body,
+
+		hover: (
+			transform: translateY(-0.25rem),
+		),
 	),
 	$template-card
 );

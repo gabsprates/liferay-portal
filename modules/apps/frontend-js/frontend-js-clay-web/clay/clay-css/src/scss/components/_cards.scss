@@ -39,10 +39,6 @@
 	}
 }
 
-.card:not(:is(.card-horizontal, .template-card-horizontal)):hover {
-	transform: translateY(-0.25rem);
-}
-
 .card-body {
 	@include clay-css($card-body);
 }
@@ -492,7 +488,7 @@
 	}
 
 	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) {
-		&:hover .card {
+		&:hover {
 			transform: none;
 		}
 
