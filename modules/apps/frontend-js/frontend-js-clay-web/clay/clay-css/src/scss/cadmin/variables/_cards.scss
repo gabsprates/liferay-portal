@@ -204,7 +204,7 @@ $card: map-deep-merge(
 		),
 
 		hover: (
-			box-shadow: clay-enable-shadows($cadmin-card-box-shadow),
+			box-shadow: clay-enable-shadows($cadmin-card-hover-box-shadow),
 		),
 	),
 	$card
@@ -509,13 +509,13 @@ $cadmin-card-interactive-secondary: map-deep-merge(
 		hover: (
 			background-color: $cadmin-white,
 			border-color: transparent,
-			box-shadow: 0 0 0 2px #719aff,
+			box-shadow: $cadmin-card-hover-box-shadow,
 			color: $cadmin-gray-900,
 		),
 
 		focus: (
 			border-color: transparent,
-			box-shadow: 0 0 0 2px #719aff,
+			box-shadow: $cadmin-card-hover-box-shadow,
 		),
 
 		active: (
