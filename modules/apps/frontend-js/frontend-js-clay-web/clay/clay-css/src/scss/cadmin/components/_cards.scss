@@ -25,10 +25,6 @@
 	}
 }
 
-.card:not(:is(.card-horizontal, .template-card-horizontal)):hover {
-	transform: translateY(-0.25rem);
-}
-
 .card-body {
 	@include clay-css($cadmin-card-body);
 }
@@ -368,14 +364,14 @@
 	}
 
 	&:has(.custom-control-input:is(.disabled, :disabled, [disabled])) {
+		&:hover {
+			transform: none;
+		}
+
 		.card {
 			box-shadow: none;
 			border-color: $cadmin-card-border-color;
 			outline: none;
-		}
-
-		&:hover .card {
-			transform: none;
 		}
 	}
 }
