@@ -180,6 +180,10 @@ public class DesignLibraryResourcesDisplayContext {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
+		boolean hasAssignMembersPermission = GroupPermissionUtil.contains(
+			_themeDisplay.getPermissionChecker(), group.getGroupId(),
+			ActionKeys.ASSIGN_MEMBERS);
+
 		boolean hasUpdatePermission = _hasPermission(group, ActionKeys.UPDATE);
 
 		if (hasUpdatePermission) {
@@ -218,14 +222,15 @@ public class DesignLibraryResourcesDisplayContext {
 			JSONUtil.put(
 				"externalReferenceCode", group.getExternalReferenceCode()
 			).put(
-				"hasAssignMembersPermission",
-				GroupPermissionUtil.contains(
-					_themeDisplay.getPermissionChecker(), group.getGroupId(),
-					ActionKeys.ASSIGN_MEMBERS)
+				"hasAssignMembersPermission", hasAssignMembersPermission
 			).put(
 				"href", "#manage-members"
 			).put(
-				"label", LanguageUtil.get(_httpServletRequest, "manage-members")
+				"label",
+				LanguageUtil.get(
+					_httpServletRequest,
+					hasAssignMembersPermission ? "manage-members" :
+						"view-members")
 			).put(
 				"ownerId", String.valueOf(group.getCreatorUserId())
 			).put(

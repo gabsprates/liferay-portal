@@ -72,7 +72,11 @@ export default function DesignLibraryManageMembersModal({
 			)}
 			externalReferenceCode={externalReferenceCode}
 			hasAssignMembersPermission={hasAssignMembersPermission}
-			headerTitle={Liferay.Language.get('manage-members')}
+			headerTitle={
+				hasAssignMembersPermission
+					? Liferay.Language.get('manage-members')
+					: Liferay.Language.get('view-members')
+			}
 			ownerId={ownerId}
 			renderAddMembersInput={(api) => <AddMembersInput {...api} />}
 		/>

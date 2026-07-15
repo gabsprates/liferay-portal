@@ -89,14 +89,6 @@ public class DesignLibraryResourcesDisplayContextTest {
 			depotEntry
 		);
 
-		_groupPermissionUtilMockedStatic.when(
-			() -> GroupPermissionUtil.contains(
-				Mockito.any(PermissionChecker.class), Mockito.anyLong(),
-				Mockito.anyString())
-		).thenReturn(
-			false
-		);
-
 		_languageUtilMockedStatic.when(
 			() -> LanguageUtil.get(
 				Mockito.any(HttpServletRequest.class), Mockito.anyString())
@@ -130,10 +122,21 @@ public class DesignLibraryResourcesDisplayContextTest {
 	}
 
 	@Test
+	public void testGetBreadcrumbPropsActionItemsWithAssignMembersPermission()
+		throws Exception {
+
+		List<String> labels = _getActionItemLabels(false, false, true);
+
+		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
+
+		Assert.assertFalse(labels.toString(), labels.contains("view-members"));
+	}
+
+	@Test
 	public void testGetBreadcrumbPropsActionItemsWithDeletePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(false, true);
+		List<String> labels = _getActionItemLabels(false, true, false);
 
 		Assert.assertTrue(labels.toString(), labels.contains("delete"));
 
@@ -146,23 +149,25 @@ public class DesignLibraryResourcesDisplayContextTest {
 	public void testGetBreadcrumbPropsActionItemsWithNoPermissions()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(false, false);
+		List<String> labels = _getActionItemLabels(false, false, false);
 
 		Assert.assertTrue(
 			labels.toString(), labels.contains("connected-sites"));
-		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
+		Assert.assertTrue(labels.toString(), labels.contains("view-members"));
 
 		Assert.assertFalse(labels.toString(), labels.contains("settings"));
 		Assert.assertFalse(labels.toString(), labels.contains("export"));
 		Assert.assertFalse(labels.toString(), labels.contains("import"));
 		Assert.assertFalse(labels.toString(), labels.contains("delete"));
+		Assert.assertFalse(
+			labels.toString(), labels.contains("manage-members"));
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithUpdateAndDeletePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(true, true);
+		List<String> labels = _getActionItemLabels(true, true, true);
 
 		Assert.assertTrue(labels.toString(), labels.contains("settings"));
 		Assert.assertTrue(
@@ -177,7 +182,7 @@ public class DesignLibraryResourcesDisplayContextTest {
 	public void testGetBreadcrumbPropsActionItemsWithUpdatePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(true, false);
+		List<String> labels = _getActionItemLabels(true, false, false);
 
 		Assert.assertTrue(labels.toString(), labels.contains("settings"));
 		Assert.assertTrue(labels.toString(), labels.contains("export"));
@@ -187,8 +192,17 @@ public class DesignLibraryResourcesDisplayContextTest {
 	}
 
 	private List<String> _getActionItemLabels(
-			boolean hasUpdatePermission, boolean hasDeletePermission)
+			boolean hasUpdatePermission, boolean hasDeletePermission,
+			boolean hasAssignMembersPermission)
 		throws Exception {
+
+		_groupPermissionUtilMockedStatic.when(
+			() -> GroupPermissionUtil.contains(
+				Mockito.any(PermissionChecker.class), Mockito.anyLong(),
+				Mockito.eq(ActionKeys.ASSIGN_MEMBERS))
+		).thenReturn(
+			hasAssignMembersPermission
+		);
 
 		PermissionChecker permissionChecker = Mockito.mock(
 			PermissionChecker.class);
