@@ -11,9 +11,11 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -240,6 +242,87 @@ public class StyleBookEntryServiceTest {
 		}
 	}
 
+	@Test
+	public void testGetStyleBookEntryFromDepotEntryWithoutViewPermission()
+		throws Exception {
+
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			DepotConstants.TYPE_DESIGN_LIBRARY, _serviceContext);
+
+		try {
+			long depotGroupId = depotEntry.getGroupId();
+
+			StyleBookEntry styleBookEntry =
+				_styleBookEntryService.addStyleBookEntry(
+					null, depotGroupId, RandomTestUtil.randomString(),
+					StringPool.BLANK, RandomTestUtil.randomString(),
+					ServiceContextTestUtil.getServiceContext(
+						depotGroupId, TestPropsValues.getUserId()));
+
+			UserTestUtil.setUser(UserTestUtil.addUser());
+
+			_styleBookEntryService.getStyleBookEntry(
+				styleBookEntry.getStyleBookEntryId());
+
+			Assert.fail();
+		}
+		catch (PrincipalException principalException) {
+		}
+		finally {
+			UserTestUtil.setUser(TestPropsValues.getUser());
+
+			_depotEntryLocalService.deleteDepotEntry(depotEntry);
+		}
+	}
+
+	@Test
+	public void testGetStyleBookEntryFromDepotEntryWithViewPermission()
+		throws Exception {
+
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			DepotConstants.TYPE_DESIGN_LIBRARY, _serviceContext);
+
+		try {
+			long depotGroupId = depotEntry.getGroupId();
+
+			StyleBookEntry styleBookEntry =
+				_styleBookEntryService.addStyleBookEntry(
+					null, depotGroupId, RandomTestUtil.randomString(),
+					StringPool.BLANK, RandomTestUtil.randomString(),
+					ServiceContextTestUtil.getServiceContext(
+						depotGroupId, TestPropsValues.getUserId()));
+
+			User user = UserTestUtil.addUser();
+
+			_userLocalService.addGroupUsers(
+				depotGroupId, new long[] {user.getUserId()});
+
+			UserTestUtil.setUser(user);
+
+			Assert.assertEquals(
+				styleBookEntry,
+				_styleBookEntryService.getStyleBookEntry(
+					styleBookEntry.getStyleBookEntryId()));
+		}
+		finally {
+			UserTestUtil.setUser(TestPropsValues.getUser());
+
+			_depotEntryLocalService.deleteDepotEntry(depotEntry);
+		}
+	}
+
 	@Inject
 	private DepotEntryLocalService _depotEntryLocalService;
 
@@ -253,5 +336,8 @@ public class StyleBookEntryServiceTest {
 
 	@Inject
 	private StyleBookEntryService _styleBookEntryService;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }

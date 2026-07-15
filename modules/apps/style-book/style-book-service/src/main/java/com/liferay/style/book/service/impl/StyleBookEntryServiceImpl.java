@@ -8,9 +8,13 @@ package com.liferay.style.book.service.impl;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.style.book.constants.StyleBookActionKeys;
 import com.liferay.style.book.constants.StyleBookConstants;
@@ -143,9 +147,7 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 			String externalReferenceCode, long groupId)
 		throws PortalException {
 
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId,
-			StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES);
+		_checkViewPermission(groupId);
 
 		return styleBookEntryLocalService.
 			fetchStyleBookEntryByExternalReferenceCode(
@@ -210,9 +212,7 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_portletResourcePermission.check(
-			getPermissionChecker(), styleBookEntry.getGroupId(),
-			StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES);
+		_checkViewPermission(styleBookEntry.getGroupId());
 
 		return styleBookEntry;
 	}
@@ -222,9 +222,7 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 			String externalReferenceCode, long groupId)
 		throws PortalException {
 
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId,
-			StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES);
+		_checkViewPermission(groupId);
 
 		return styleBookEntryLocalService.
 			getStyleBookEntryByExternalReferenceCode(
@@ -344,6 +342,24 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 		return styleBookEntryLocalService.updateStyleBookEntry(
 			styleBookEntryId, frontendTokensValues, name, serviceContext);
 	}
+
+	private void _checkViewPermission(long groupId) throws PortalException {
+		Group group = _groupLocalService.getGroup(groupId);
+
+		if (group.isDepot() &&
+			GroupPermissionUtil.contains(
+				getPermissionChecker(), group, ActionKeys.VIEW)) {
+
+			return;
+		}
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES);
+	}
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference(
 		target = "(resource.name=" + StyleBookConstants.RESOURCE_NAME + ")"
