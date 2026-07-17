@@ -6,6 +6,8 @@
 package com.liferay.product.navigation.control.panel.internal.application.list;
 
 import com.liferay.application.list.BasePanelCategory;
+import com.liferay.application.list.PanelApp;
+import com.liferay.application.list.PanelAppRegistry;
 import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -46,11 +48,27 @@ public class ApplicationsPanelCategory extends BasePanelCategory {
 	public boolean isShow(PermissionChecker permissionChecker, Group group)
 		throws PortalException {
 
-		return PortalPermissionUtil.contains(
-			permissionChecker, ActionKeys.VIEW_CONTROL_PANEL);
+		if (PortalPermissionUtil.contains(
+				permissionChecker, ActionKeys.VIEW_CONTROL_PANEL)) {
+
+			return true;
+		}
+
+		PanelApp panelApp = _panelAppRegistry.getFirstAvailablePanelApp(
+			PanelCategoryKeys.APPLICATIONS_MENU_APPLICATIONS, permissionChecker,
+			group);
+
+		if (panelApp != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private PanelAppRegistry _panelAppRegistry;
 
 }
