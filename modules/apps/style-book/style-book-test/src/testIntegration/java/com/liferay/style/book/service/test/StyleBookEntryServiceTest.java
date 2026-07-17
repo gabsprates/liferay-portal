@@ -276,8 +276,6 @@ public class StyleBookEntryServiceTest {
 		}
 		finally {
 			UserTestUtil.setUser(TestPropsValues.getUser());
-
-			_depotEntryLocalService.deleteDepotEntry(depotEntry);
 		}
 	}
 
@@ -318,8 +316,6 @@ public class StyleBookEntryServiceTest {
 		}
 		finally {
 			UserTestUtil.setUser(TestPropsValues.getUser());
-
-			_depotEntryLocalService.deleteDepotEntry(depotEntry);
 		}
 	}
 
