@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -57,10 +56,6 @@ public class DesignLibraryResourcesDisplayContextTest {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
-
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(Mockito.mock(Portal.class));
 
 		_group = Mockito.mock(Group.class);
 
@@ -119,6 +114,7 @@ public class DesignLibraryResourcesDisplayContextTest {
 		_depotEntryLocalServiceUtilMockedStatic.close();
 		_groupPermissionUtilMockedStatic.close();
 		_languageUtilMockedStatic.close();
+		_portalUtilMockedStatic.close();
 		_portletURLBuilderMockedStatic.close();
 	}
 
@@ -280,6 +276,8 @@ public class DesignLibraryResourcesDisplayContextTest {
 			GroupPermissionUtil.class);
 	private static final MockedStatic<LanguageUtil> _languageUtilMockedStatic =
 		Mockito.mockStatic(LanguageUtil.class);
+	private static final MockedStatic<PortalUtil> _portalUtilMockedStatic =
+		Mockito.mockStatic(PortalUtil.class);
 	private static final MockedStatic<PortletURLBuilder>
 		_portletURLBuilderMockedStatic = Mockito.mockStatic(
 			PortletURLBuilder.class);
