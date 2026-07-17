@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -115,83 +116,84 @@ public class DesignLibraryResourcesDisplayContextTest {
 
 	@AfterClass
 	public static void tearDownClass() {
-		_portletURLBuilderMockedStatic.close();
-		_languageUtilMockedStatic.close();
-		_groupPermissionUtilMockedStatic.close();
 		_depotEntryLocalServiceUtilMockedStatic.close();
+		_groupPermissionUtilMockedStatic.close();
+		_languageUtilMockedStatic.close();
+		_portletURLBuilderMockedStatic.close();
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithAssignMembersPermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(false, false, true);
-
-		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
+		List<String> labels = _getBreadcrumbPropsActionItemsLabels(
+			false, false, true);
 
 		Assert.assertFalse(labels.toString(), labels.contains("view-members"));
+		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithDeletePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(false, true, false);
+		List<String> labels = _getBreadcrumbPropsActionItemsLabels(
+			false, true, false);
 
-		Assert.assertTrue(labels.toString(), labels.contains("delete"));
-
-		Assert.assertFalse(labels.toString(), labels.contains("settings"));
 		Assert.assertFalse(labels.toString(), labels.contains("export"));
 		Assert.assertFalse(labels.toString(), labels.contains("import"));
+		Assert.assertFalse(labels.toString(), labels.contains("settings"));
+		Assert.assertTrue(labels.toString(), labels.contains("delete"));
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithNoPermissions()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(false, false, false);
+		List<String> labels = _getBreadcrumbPropsActionItemsLabels(
+			false, false, false);
 
+		Assert.assertFalse(labels.toString(), labels.contains("delete"));
+		Assert.assertFalse(labels.toString(), labels.contains("export"));
+		Assert.assertFalse(labels.toString(), labels.contains("import"));
+		Assert.assertFalse(
+			labels.toString(), labels.contains("manage-members"));
+		Assert.assertFalse(labels.toString(), labels.contains("settings"));
 		Assert.assertTrue(
 			labels.toString(), labels.contains("connected-sites"));
 		Assert.assertTrue(labels.toString(), labels.contains("view-members"));
-
-		Assert.assertFalse(labels.toString(), labels.contains("settings"));
-		Assert.assertFalse(labels.toString(), labels.contains("export"));
-		Assert.assertFalse(labels.toString(), labels.contains("import"));
-		Assert.assertFalse(labels.toString(), labels.contains("delete"));
-		Assert.assertFalse(
-			labels.toString(), labels.contains("manage-members"));
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithUpdateAndDeletePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(true, true, true);
+		List<String> labels = _getBreadcrumbPropsActionItemsLabels(
+			true, true, true);
 
-		Assert.assertTrue(labels.toString(), labels.contains("settings"));
 		Assert.assertTrue(
 			labels.toString(), labels.contains("connected-sites"));
-		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
+		Assert.assertTrue(labels.toString(), labels.contains("delete"));
 		Assert.assertTrue(labels.toString(), labels.contains("export"));
 		Assert.assertTrue(labels.toString(), labels.contains("import"));
-		Assert.assertTrue(labels.toString(), labels.contains("delete"));
+		Assert.assertTrue(labels.toString(), labels.contains("manage-members"));
+		Assert.assertTrue(labels.toString(), labels.contains("settings"));
 	}
 
 	@Test
 	public void testGetBreadcrumbPropsActionItemsWithUpdatePermission()
 		throws Exception {
 
-		List<String> labels = _getActionItemLabels(true, false, false);
-
-		Assert.assertTrue(labels.toString(), labels.contains("settings"));
-		Assert.assertTrue(labels.toString(), labels.contains("export"));
-		Assert.assertTrue(labels.toString(), labels.contains("import"));
+		List<String> labels = _getBreadcrumbPropsActionItemsLabels(
+			true, false, false);
 
 		Assert.assertFalse(labels.toString(), labels.contains("delete"));
+		Assert.assertTrue(labels.toString(), labels.contains("export"));
+		Assert.assertTrue(labels.toString(), labels.contains("import"));
+		Assert.assertTrue(labels.toString(), labels.contains("settings"));
 	}
 
-	private List<String> _getActionItemLabels(
+	private List<String> _getBreadcrumbPropsActionItemsLabels(
 			boolean hasUpdatePermission, boolean hasDeletePermission,
 			boolean hasAssignMembersPermission)
 		throws Exception {
@@ -250,14 +252,13 @@ public class DesignLibraryResourcesDisplayContextTest {
 					httpServletRequest,
 					Mockito.mock(LiferayPortletResponse.class));
 
-		JSONArray jsonArray =
-			(JSONArray)designLibraryResourcesDisplayContext.getBreadcrumbProps(
-				_group.getClassPK()
-			).get(
-				"actionItems"
-			);
-
 		List<String> labels = new ArrayList<>();
+
+		Map<String, Object> breadcrumbProps =
+			designLibraryResourcesDisplayContext.getBreadcrumbProps(
+				_group.getClassPK());
+
+		JSONArray jsonArray = (JSONArray)breadcrumbProps.get("actionItems");
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
