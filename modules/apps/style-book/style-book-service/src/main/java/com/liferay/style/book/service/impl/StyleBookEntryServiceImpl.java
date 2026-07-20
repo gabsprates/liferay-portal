@@ -5,14 +5,15 @@
 
 package com.liferay.style.book.service.impl;
 
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -344,11 +345,13 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 	}
 
 	private void _checkViewPermission(long groupId) throws PortalException {
-		Group group = _groupLocalService.getGroup(groupId);
+		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
+			groupId);
 
-		if (group.isDepot() &&
+		if ((depotEntry != null) &&
+			(depotEntry.getType() == DepotConstants.TYPE_DESIGN_LIBRARY) &&
 			GroupPermissionUtil.contains(
-				getPermissionChecker(), group, ActionKeys.VIEW)) {
+				getPermissionChecker(), groupId, ActionKeys.VIEW)) {
 
 			return;
 		}
@@ -359,7 +362,7 @@ public class StyleBookEntryServiceImpl extends StyleBookEntryServiceBaseImpl {
 	}
 
 	@Reference
-	private GroupLocalService _groupLocalService;
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference(
 		target = "(resource.name=" + StyleBookConstants.RESOURCE_NAME + ")"

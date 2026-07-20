@@ -243,6 +243,48 @@ public class StyleBookEntryServiceTest {
 	}
 
 	@Test
+	public void testGetStyleBookEntryFromAssetLibraryDepotEntryWithViewPermission()
+		throws Exception {
+
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			DepotConstants.TYPE_ASSET_LIBRARY, _serviceContext);
+
+		try {
+			long depotGroupId = depotEntry.getGroupId();
+
+			StyleBookEntry styleBookEntry =
+				_styleBookEntryService.addStyleBookEntry(
+					null, depotGroupId, RandomTestUtil.randomString(),
+					StringPool.BLANK, RandomTestUtil.randomString(),
+					ServiceContextTestUtil.getServiceContext(
+						depotGroupId, TestPropsValues.getUserId()));
+
+			User user = UserTestUtil.addUser();
+
+			_userLocalService.addGroupUsers(
+				depotGroupId, new long[] {user.getUserId()});
+
+			UserTestUtil.setUser(user);
+
+			_styleBookEntryService.getStyleBookEntry(
+				styleBookEntry.getStyleBookEntryId());
+
+			Assert.fail();
+		}
+		catch (PrincipalException principalException) {
+		}
+		finally {
+			UserTestUtil.setUser(TestPropsValues.getUser());
+		}
+	}
+
+	@Test
 	public void testGetStyleBookEntryFromDepotEntryWithoutViewPermission()
 		throws Exception {
 
