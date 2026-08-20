@@ -6728,7 +6728,7 @@ test.describe('Manage object entries through Workflow', () => {
 			applicationName
 		);
 
-		await globalMenuPage.goToApplications('Metrics');
+		await globalMenuPage.goToApplications('Workflow Metrics');
 
 		await metricsPage.chooseProcess(assetType);
 
