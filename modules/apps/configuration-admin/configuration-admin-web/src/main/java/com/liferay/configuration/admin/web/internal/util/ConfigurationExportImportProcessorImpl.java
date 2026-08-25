@@ -6,6 +6,7 @@
 package com.liferay.configuration.admin.web.internal.util;
 
 import com.liferay.configuration.admin.exportimport.ConfigurationExportImportProcessor;
+import com.liferay.configuration.admin.util.ConfigurationScopePropertyKeyResolver;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -21,6 +22,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.io.Serializable;
 
 import java.util.Dictionary;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,12 +39,18 @@ public class ConfigurationExportImportProcessorImpl
 			String pid, Dictionary<String, Object> properties)
 		throws PortalException {
 
+		Set<String> declaredScopePropertyKeys =
+			_configurationScopePropertyKeyResolver.getDeclaredScopePropertyKeys(
+				pid);
+
 		for (ExtendedObjectClassDefinition.Scope scope :
 				ExtendedObjectClassDefinition.Scope.values()) {
 
 			String propertyKey = scope.getPropertyKey();
 
-			if (propertyKey == null) {
+			if ((propertyKey == null) ||
+				declaredScopePropertyKeys.contains(propertyKey)) {
+
 				continue;
 			}
 
@@ -88,12 +96,18 @@ public class ConfigurationExportImportProcessorImpl
 			String pid, Dictionary<String, Object> properties)
 		throws PortalException {
 
+		Set<String> declaredScopePropertyKeys =
+			_configurationScopePropertyKeyResolver.getDeclaredScopePropertyKeys(
+				pid);
+
 		for (ExtendedObjectClassDefinition.Scope scope :
 				ExtendedObjectClassDefinition.Scope.values()) {
 
 			String portablePropertyKey = scope.getPortablePropertyKey();
 
-			if (portablePropertyKey == null) {
+			if ((portablePropertyKey == null) ||
+				declaredScopePropertyKeys.contains(portablePropertyKey)) {
+
 				continue;
 			}
 
@@ -207,6 +221,10 @@ public class ConfigurationExportImportProcessorImpl
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private ConfigurationScopePropertyKeyResolver
+		_configurationScopePropertyKeyResolver;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
