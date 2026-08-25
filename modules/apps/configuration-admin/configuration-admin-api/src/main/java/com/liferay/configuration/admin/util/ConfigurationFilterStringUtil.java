@@ -14,6 +14,9 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -124,20 +127,45 @@ public class ConfigurationFilterStringUtil {
 	}
 
 	public static String getSystemScopedFilterString() {
+		return getSystemScopedFilterString(Collections.emptySet());
+	}
+
+	public static String getSystemScopedFilterString(
+		Set<String> declaredPropertyKeys) {
+
+		String companyIdPropertyKey =
+			ExtendedObjectClassDefinition.Scope.COMPANY.getPropertyKey();
+
+		String companyIdFilterString = StringPool.BLANK;
+
+		if (!declaredPropertyKeys.contains(companyIdPropertyKey)) {
+			companyIdFilterString = StringBundler.concat(
+				"(|(!(", companyIdPropertyKey, "=*))(", companyIdPropertyKey,
+				"=0))");
+		}
+
 		return StringBundler.concat(
-			"(&(|(!(",
-			ExtendedObjectClassDefinition.Scope.COMPANY.getPropertyKey(),
-			"=*))(",
-			ExtendedObjectClassDefinition.Scope.COMPANY.getPropertyKey(),
-			"=0))(!(dxp.lxc.liferay.com.virtualInstanceId=*))(!(",
-			ExtendedObjectClassDefinition.Scope.GROUP.getPropertyKey(),
-			"=*))(!(siteExternalReferenceCode=*))(!(",
-			ExtendedObjectClassDefinition.Scope.PORTLET_INSTANCE.
-				getPropertyKey(),
-			"=*)))");
+			"(&", companyIdFilterString,
+			"(!(dxp.lxc.liferay.com.virtualInstanceId=*))",
+			_getExcludedPropertyFilterString(
+				ExtendedObjectClassDefinition.Scope.GROUP.getPropertyKey(),
+				declaredPropertyKeys),
+			_getExcludedPropertyFilterString(
+				"siteExternalReferenceCode", declaredPropertyKeys),
+			_getExcludedPropertyFilterString(
+				ExtendedObjectClassDefinition.Scope.PORTLET_INSTANCE.
+					getPropertyKey(),
+				declaredPropertyKeys),
+			StringPool.CLOSE_PARENTHESIS);
 	}
 
 	public static String getSystemScopedFilterString(String pid) {
+		return getSystemScopedFilterString(pid, Collections.emptySet());
+	}
+
+	public static String getSystemScopedFilterString(
+		String pid, Set<String> declaredPropertyKeys) {
+
 		String filterString = StringBundler.concat(
 			StringPool.OPEN_PARENTHESIS, StringPool.PIPE,
 			_getPropertyFilterString(
@@ -157,7 +185,18 @@ public class ConfigurationFilterStringUtil {
 
 		return StringBundler.concat(
 			StringPool.OPEN_PARENTHESIS, StringPool.AMPERSAND, filterString,
-			getSystemScopedFilterString(), StringPool.CLOSE_PARENTHESIS);
+			getSystemScopedFilterString(declaredPropertyKeys),
+			StringPool.CLOSE_PARENTHESIS);
+	}
+
+	private static String _getExcludedPropertyFilterString(
+		String key, Set<String> declaredPropertyKeys) {
+
+		if (declaredPropertyKeys.contains(key)) {
+			return StringPool.BLANK;
+		}
+
+		return StringBundler.concat("(!(", key, "=*))");
 	}
 
 	private static String _getPropertyFilterString(String key, String value) {

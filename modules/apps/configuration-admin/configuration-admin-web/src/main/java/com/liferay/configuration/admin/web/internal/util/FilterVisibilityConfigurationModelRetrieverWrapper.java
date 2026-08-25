@@ -52,12 +52,22 @@ public class FilterVisibilityConfigurationModelRetrieverWrapper
 		String pid, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK, boolean strictScope) {
 
+		return getConfiguration(
+			pid, scope, scopePK, strictScope, Collections.emptySet());
+	}
+
+	@Override
+	public Configuration getConfiguration(
+		String pid, ExtendedObjectClassDefinition.Scope scope,
+		Serializable scopePK, boolean strictScope,
+		Set<String> declaredScopePropertyKeys) {
+
 		if (!ConfigurationVisibilityUtil.isVisible(pid, scope, scopePK)) {
 			return null;
 		}
 
 		return _configurationModelRetriever.getConfiguration(
-			pid, scope, scopePK, strictScope);
+			pid, scope, scopePK, strictScope, declaredScopePropertyKeys);
 	}
 
 	@Override

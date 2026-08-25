@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Collections;
 import java.util.Map;
 
 import junit.framework.AssertionFailedError;
@@ -128,13 +129,15 @@ public class ConfigurationModelRetrieverImplTest {
 		Mockito.verify(
 			configurationModelRetrieverImpl, Mockito.never()
 		).getConfiguration(
-			pid, ExtendedObjectClassDefinition.Scope.COMPANY, companyId, true
+			pid, ExtendedObjectClassDefinition.Scope.COMPANY, companyId, true,
+			Collections.emptySet()
 		);
 
 		Mockito.verify(
 			configurationModelRetrieverImpl, Mockito.never()
 		).getConfiguration(
-			pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, true
+			pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, true,
+			Collections.emptySet()
 		);
 
 		Mockito.clearInvocations(configurationModelRetrieverImpl);
@@ -151,13 +154,15 @@ public class ConfigurationModelRetrieverImplTest {
 		Mockito.verify(
 			configurationModelRetrieverImpl, Mockito.times(1)
 		).getConfiguration(
-			pid, ExtendedObjectClassDefinition.Scope.COMPANY, companyId, false
+			pid, ExtendedObjectClassDefinition.Scope.COMPANY, companyId, false,
+			Collections.emptySet()
 		);
 
 		Mockito.verify(
 			configurationModelRetrieverImpl, Mockito.times(1)
 		).getConfiguration(
-			pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, false
+			pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, false,
+			Collections.emptySet()
 		);
 	}
 
@@ -368,6 +373,31 @@ public class ConfigurationModelRetrieverImplTest {
 			HashMapBuilder.put(
 				key, pid + ".scoped"
 			).build());
+	}
+
+	@Test
+	public void testGetPidFilterStringScopeSystemWithDeclaredPropertyKeys()
+		throws Exception {
+
+		String pid = "foo";
+
+		Map<String, String> payload = HashMapBuilder.put(
+			Constants.SERVICE_PID, pid
+		).put(
+			"groupId", "any"
+		).build();
+
+		_test(
+			false,
+			_configurationModelRetrieverImpl.getPidFilterString(
+				pid, ExtendedObjectClassDefinition.Scope.SYSTEM),
+			payload);
+		_test(
+			true,
+			_configurationModelRetrieverImpl.getPidFilterString(
+				pid, ExtendedObjectClassDefinition.Scope.SYSTEM,
+				Collections.singleton("groupId")),
+			payload);
 	}
 
 	private void _test(

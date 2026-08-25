@@ -13,6 +13,7 @@ import java.io.Serializable;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 
@@ -451,6 +452,45 @@ public class ConfigurationFilterStringUtilTest {
 				Constants.SERVICE_PID, pid
 			).put(
 				"companyId", "0"
+			).build());
+	}
+
+	@Test
+	public void testGetSystemScopedFilterStringWithDeclaredPropertyKeys()
+		throws Exception {
+
+		for (String key :
+				new String[] {
+					"companyId", "groupId", "portletInstanceId",
+					"siteExternalReferenceCode"
+				}) {
+
+			Set<String> declaredPropertyKeys = Collections.singleton(key);
+
+			Map<String, Serializable> payload =
+				HashMapBuilder.<String, Serializable>put(
+					key, "any"
+				).build();
+
+			_test(
+				false,
+				ConfigurationFilterStringUtil.getSystemScopedFilterString(),
+				payload);
+			_test(
+				true,
+				ConfigurationFilterStringUtil.getSystemScopedFilterString(
+					declaredPropertyKeys),
+				payload);
+		}
+
+		_test(
+			false,
+			ConfigurationFilterStringUtil.getSystemScopedFilterString(
+				Collections.singleton("groupId")),
+			HashMapBuilder.<String, Serializable>put(
+				"groupId", "any"
+			).put(
+				"siteExternalReferenceCode", "any"
 			).build());
 	}
 

@@ -116,7 +116,8 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		configurationModel = new ConfigurationModel(
 			_configurationModelRetriever.getConfiguration(
 				pid, configurationScopeDisplayContext.getScope(),
-				configurationScopeDisplayContext.getScopePK()),
+				configurationScopeDisplayContext.getScopePK(), true,
+				configurationModel.getDeclaredScopePropertyKeys()),
 			configurationModel);
 
 		if (configurationModel.isFactory() && pid.equals(factoryPid)) {

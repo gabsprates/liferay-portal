@@ -34,6 +34,11 @@ public interface ConfigurationModelRetriever {
 		String pid, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK, boolean strictScope);
 
+	public Configuration getConfiguration(
+		String pid, ExtendedObjectClassDefinition.Scope scope,
+		Serializable scopePK, boolean strictScope,
+		Set<String> declaredScopePropertyKeys);
+
 	public Map<String, ConfigurationModel> getConfigurationModels(
 		Bundle bundle, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK);
