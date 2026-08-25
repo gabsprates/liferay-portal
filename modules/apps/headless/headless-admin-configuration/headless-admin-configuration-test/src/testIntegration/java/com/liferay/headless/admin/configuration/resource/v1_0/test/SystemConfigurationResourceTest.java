@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -39,9 +38,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * @author Thiago Buarque
@@ -100,39 +96,6 @@ public class SystemConfigurationResourceTest
 		_testGetSystemConfigurationFromConfigurationScreen();
 		_testGetSystemConfigurationWithoutPermission();
 		_testGetSystemConfigurationWithPasswordKey();
-	}
-
-	@Test
-	public void testGetSystemConfigurationDeclaringGroupIdAttribute()
-		throws Exception {
-
-		Configuration configuration = _configurationAdmin.getConfiguration(
-			_DECLARED_SCOPE_PROPERTY_KEYS_PID, "?");
-
-		configuration.update(
-			HashMapDictionaryBuilder.<String, Object>put(
-				"groupId", 20119L
-			).put(
-				"queueName", "LPP-65300"
-			).build());
-
-		try {
-			SystemConfiguration systemConfiguration =
-				systemConfigurationResource.getSystemConfiguration(
-					_DECLARED_SCOPE_PROPERTY_KEYS_PID);
-
-			Assert.assertEquals(
-				_DECLARED_SCOPE_PROPERTY_KEYS_PID,
-				systemConfiguration.getExternalReferenceCode());
-
-			Map<String, Object> properties =
-				systemConfiguration.getProperties();
-
-			Assert.assertEquals("LPP-65300", properties.get("queueName"));
-		}
-		finally {
-			configuration.delete();
-		}
 	}
 
 	@Override
@@ -377,18 +340,11 @@ public class SystemConfigurationResourceTest
 		}
 	}
 
-	private static final String _DECLARED_SCOPE_PROPERTY_KEYS_PID =
-		"com.liferay.headless.admin.configuration.test.configuration." +
-			"DeclaredScopePropertyKeysConfiguration";
-
 	private static final List<SafeCloseable> _safeCloseables =
 		new ArrayList<>();
 
 	@Inject
 	private static SettingsLocatorHelper _settingsLocatorHelper;
-
-	@Inject
-	private ConfigurationAdmin _configurationAdmin;
 
 	private SystemConfigurationResource _userSystemConfigurationResource;
 

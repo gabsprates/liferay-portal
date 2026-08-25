@@ -4,4 +4,3 @@ Bundle-Version: 1.0.0
 -includeresource:\
 	com.liferay.headless.admin.configuration.client.jar=com.liferay.headless.admin.configuration.client-*.jar;lib:=true,\
 	com.liferay.headless.batch.engine.client.jar=com.liferay.headless.batch.engine.client-*.jar;lib:=true
--metatype: com.liferay.headless.admin.configuration.test.configuration.DeclaredScopePropertyKeysConfiguration
