@@ -9,10 +9,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
+import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -66,6 +69,30 @@ public class EditConfigurationMVCRenderCommandTest {
 
 			_configuration = null;
 		}
+	}
+
+	@Test
+	public void testDeleteFindsConfigurationDeclaringGroupIdAttribute()
+		throws Exception {
+
+		_addConfiguration();
+
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
+
+		mockLiferayPortletActionRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, _getThemeDisplay());
+		mockLiferayPortletActionRequest.setParameter("pid", _PID);
+
+		_mvcActionCommand.processAction(
+			mockLiferayPortletActionRequest,
+			new MockLiferayPortletActionResponse());
+
+		Assert.assertNull(
+			_configurationAdmin.listConfigurations(
+				"(service.pid=" + _PID + ")"));
+
+		_configuration = null;
 	}
 
 	@Test
@@ -206,6 +233,12 @@ public class EditConfigurationMVCRenderCommandTest {
 
 	@Inject
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Inject(
+		filter = "mvc.command.name=/configuration_admin/delete_configuration",
+		type = MVCActionCommand.class
+	)
+	private MVCActionCommand _mvcActionCommand;
 
 	@Inject(
 		filter = "mvc.command.name=/configuration_admin/edit_configuration",
