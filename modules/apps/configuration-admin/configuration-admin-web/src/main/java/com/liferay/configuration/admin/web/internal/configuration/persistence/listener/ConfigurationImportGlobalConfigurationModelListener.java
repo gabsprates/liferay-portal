@@ -6,6 +6,7 @@
 package com.liferay.configuration.admin.web.internal.configuration.persistence.listener;
 
 import com.liferay.configuration.admin.exportimport.ConfigurationExportImportProcessor;
+import com.liferay.configuration.admin.util.ConfigurationScopePropertyKeyResolver;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
@@ -14,6 +15,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.Dictionary;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,11 +44,21 @@ public class ConfigurationImportGlobalConfigurationModelListener
 				properties);
 		}
 
+		String groupIdPropertyKey =
+			ExtendedObjectClassDefinition.Scope.GROUP.getPropertyKey();
+
+		Set<String> declaredScopePropertyKeys =
+			_configurationScopePropertyKeyResolver.getDeclaredScopePropertyKeys(
+				pid);
+
+		if (declaredScopePropertyKeys.contains(groupIdPropertyKey)) {
+			return;
+		}
+
 		Object companyId = properties.get(
 			ExtendedObjectClassDefinition.Scope.COMPANY.getPropertyKey());
 
-		Object groupId = properties.get(
-			ExtendedObjectClassDefinition.Scope.GROUP.getPropertyKey());
+		Object groupId = properties.get(groupIdPropertyKey);
 
 		if ((companyId == null) && (groupId != null)) {
 			_log.error(
@@ -63,5 +75,9 @@ public class ConfigurationImportGlobalConfigurationModelListener
 	@Reference
 	private ConfigurationExportImportProcessor
 		_configurationExportImportProcessor;
+
+	@Reference
+	private ConfigurationScopePropertyKeyResolver
+		_configurationScopePropertyKeyResolver;
 
 }
