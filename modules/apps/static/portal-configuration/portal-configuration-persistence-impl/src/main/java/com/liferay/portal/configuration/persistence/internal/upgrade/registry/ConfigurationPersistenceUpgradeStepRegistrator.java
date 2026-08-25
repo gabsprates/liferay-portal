@@ -56,6 +56,11 @@ public class ConfigurationPersistenceUpgradeStepRegistrator
 			new com.liferay.portal.configuration.persistence.internal.upgrade.
 				v2_0_1.ConfigurationUpgradeProcess(
 					_configurationAdmin, _groupLocalService));
+
+		registry.register(
+			"2.0.1", "2.0.2",
+			new com.liferay.portal.configuration.persistence.internal.upgrade.
+				v2_0_2.ConfigurationUpgradeProcess(_configurationAdmin));
 	}
 
 	@Reference
