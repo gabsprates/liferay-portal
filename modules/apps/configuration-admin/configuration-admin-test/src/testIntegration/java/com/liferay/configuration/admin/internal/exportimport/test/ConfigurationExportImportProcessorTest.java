@@ -96,6 +96,30 @@ public class ConfigurationExportImportProcessorTest {
 	}
 
 	@Test
+	public void testPrepareForExportKeepsDeclaredGroupIdAttribute()
+		throws Exception {
+
+		Dictionary<String, Object> dictionary =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"groupId", _group.getGroupId()
+			).put(
+				"queueName", "LPP-65300"
+			).build();
+
+		Assert.assertFalse(
+			_configurationExportImportProcessor.prepareForExport(
+				_DECLARED_SCOPE_PROPERTY_KEYS_PID, dictionary));
+
+		Assert.assertEquals(
+			Long.valueOf(_group.getGroupId()), dictionary.get("groupId"));
+
+		ExtendedObjectClassDefinition.Scope groupScope =
+			ExtendedObjectClassDefinition.Scope.GROUP;
+
+		Assert.assertNull(dictionary.get(groupScope.getPortablePropertyKey()));
+	}
+
+	@Test
 	public void testPrepareForImport() throws Exception {
 		String pid = RandomTestUtil.randomString();
 
@@ -150,6 +174,10 @@ public class ConfigurationExportImportProcessorTest {
 	private String _getGroupPortableIdentifier() {
 		return _getCompanyPortableIdentifier() + "--" + _group.getGroupKey();
 	}
+
+	private static final String _DECLARED_SCOPE_PROPERTY_KEYS_PID =
+		"com.liferay.configuration.admin.test.configuration." +
+			"DeclaredScopePropertyKeysConfiguration";
 
 	private Company _company;
 

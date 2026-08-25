@@ -115,6 +115,40 @@ public class ConfigurationUpgradeProcessTest {
 		_testDoUpgradeWhenDatabasePartitionIsEnabled();
 	}
 
+	@Test
+	public void testDoUpgradeKeepsDeclaredGroupIdAttribute() throws Exception {
+		Group group = _groupLocalService.getGroup(
+			CompanyThreadLocal.getCompanyId(), GroupConstants.GUEST);
+
+		_persistenceManager.store(
+			_DECLARED_SCOPE_PROPERTY_KEYS_PID,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"groupId", group.getGroupId()
+			).put(
+				"queueName", "LPP-65300"
+			).put(
+				"service.pid", _DECLARED_SCOPE_PROPERTY_KEYS_PID
+			).build());
+
+		try {
+			_configurationUpgradeProcess.upgrade();
+
+			Dictionary<?, ?> dictionary = _persistenceManager.load(
+				_DECLARED_SCOPE_PROPERTY_KEYS_PID);
+
+			Assert.assertNull(
+				dictionary.get(
+					ExtendedObjectClassDefinition.Scope.COMPANY.
+						getPropertyKey()));
+
+			Assert.assertEquals(
+				Long.valueOf(group.getGroupId()), dictionary.get("groupId"));
+		}
+		finally {
+			_persistenceManager.delete(_DECLARED_SCOPE_PROPERTY_KEYS_PID);
+		}
+	}
+
 	private void _assertConfiguration() throws Exception {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
@@ -246,6 +280,10 @@ public class ConfigurationUpgradeProcessTest {
 
 	private static final String _CONFIGURATION_ID =
 		RandomTestUtil.randomString();
+
+	private static final String _DECLARED_SCOPE_PROPERTY_KEYS_PID =
+		"com.liferay.portal.configuration.persistence.test.configuration." +
+			"DeclaredScopePropertyKeysConfiguration";
 
 	private static UpgradeProcess _configurationUpgradeProcess;
 
