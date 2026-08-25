@@ -113,7 +113,9 @@ public class ExportConfigurationMVCResourceCommand
 		}
 
 		Configuration configuration =
-			_configurationModelRetriever.getConfiguration(pid, scope, scopePK);
+			_configurationModelRetriever.getConfiguration(
+				pid, scope, scopePK, true,
+				configurationModel.getDeclaredScopePropertyKeys());
 
 		if (configuration == null) {
 			return properties;

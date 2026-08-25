@@ -91,7 +91,8 @@ public class EditConfigurationMVCRenderCommand implements MVCRenderCommand {
 			Configuration configuration =
 				_configurationModelRetriever.getConfiguration(
 					pid, configurationScopeDisplayContext.getScope(),
-					configurationScopeDisplayContext.getScopePK(), false);
+					configurationScopeDisplayContext.getScopePK(), false,
+					configurationModel.getDeclaredScopePropertyKeys());
 
 			if (configurationModel.isFactory() && pid.equals(factoryPid)) {
 				configuration = null;

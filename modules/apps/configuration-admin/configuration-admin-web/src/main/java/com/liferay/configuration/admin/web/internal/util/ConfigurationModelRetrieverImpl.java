@@ -96,8 +96,18 @@ public class ConfigurationModelRetrieverImpl
 		String pid, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK, boolean strictScope) {
 
+		return getConfiguration(
+			pid, scope, scopePK, strictScope, Collections.emptySet());
+	}
+
+	@Override
+	public Configuration getConfiguration(
+		String pid, ExtendedObjectClassDefinition.Scope scope,
+		Serializable scopePK, boolean strictScope,
+		Set<String> declaredScopePropertyKeys) {
+
 		Configuration[] configurations = _getConfigurations(
-			pid, scope, String.valueOf(scopePK));
+			pid, scope, String.valueOf(scopePK), declaredScopePropertyKeys);
 
 		if (ArrayUtil.isNotEmpty(configurations)) {
 			for (Configuration configuration : configurations) {
@@ -120,7 +130,8 @@ public class ConfigurationModelRetrieverImpl
 			scope.equals(ExtendedObjectClassDefinition.Scope.COMPANY)) {
 
 			return getConfiguration(
-				pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, false);
+				pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null, false,
+				declaredScopePropertyKeys);
 		}
 		else if (!strictScope &&
 				 scope.equals(ExtendedObjectClassDefinition.Scope.GROUP)) {
@@ -135,7 +146,7 @@ public class ConfigurationModelRetrieverImpl
 
 			return getConfiguration(
 				pid, ExtendedObjectClassDefinition.Scope.COMPANY, companyId,
-				false);
+				false, declaredScopePropertyKeys);
 		}
 
 		return null;
@@ -215,7 +226,8 @@ public class ConfigurationModelRetrieverImpl
 		return TransformUtil.transformToList(
 			_getConfigurations(
 				factoryConfigurationModel.getFactoryPid(), scope,
-				String.valueOf(scopePK)),
+				String.valueOf(scopePK),
+				factoryConfigurationModel.getDeclaredScopePropertyKeys()),
 			configuration -> new ConfigurationModel(
 				configuration.getBundleLocation(),
 				factoryConfigurationModel.getBundleSymbolicName(),
@@ -232,9 +244,16 @@ public class ConfigurationModelRetrieverImpl
 	protected String getPidFilterString(
 		String pid, ExtendedObjectClassDefinition.Scope scope) {
 
+		return getPidFilterString(pid, scope, Collections.emptySet());
+	}
+
+	protected String getPidFilterString(
+		String pid, ExtendedObjectClassDefinition.Scope scope,
+		Set<String> declaredScopePropertyKeys) {
+
 		if (scope.equals(ExtendedObjectClassDefinition.Scope.SYSTEM)) {
 			return ConfigurationFilterStringUtil.getSystemScopedFilterString(
-				pid);
+				pid, declaredScopePropertyKeys);
 		}
 
 		return _getScopedPidFilterString(pid, scope);
@@ -286,12 +305,19 @@ public class ConfigurationModelRetrieverImpl
 		ConfigurationScopeDisplayContext configurationScopeDisplayContext =
 			new ConfigurationScopeDisplayContext(scope, scopePK);
 
+		com.liferay.portal.configuration.metatype.definitions.
+			ExtendedObjectClassDefinition extendedObjectClassDefinition =
+				extendedMetaTypeInformation.getObjectClassDefinition(
+					pid, locale);
+
 		ConfigurationModel configurationModel = new ConfigurationModel(
 			StringPool.QUESTION, bundle.getSymbolicName(),
 			bundleWiring.getClassLoader(),
-			getConfiguration(pid, scope, scopePK),
-			configurationScopeDisplayContext,
-			extendedMetaTypeInformation.getObjectClassDefinition(pid, locale),
+			getConfiguration(
+				pid, scope, scopePK, true,
+				ScopePropertyKeysUtil.getDeclaredScopePropertyKeys(
+					extendedObjectClassDefinition)),
+			configurationScopeDisplayContext, extendedObjectClassDefinition,
 			factory);
 
 		if (!StringUtil.equals(configurationModel.getFactoryPid(), pid)) {
@@ -314,12 +340,13 @@ public class ConfigurationModelRetrieverImpl
 	}
 
 	private Configuration[] _getConfigurations(
-		String pid, ExtendedObjectClassDefinition.Scope scope, String value) {
+		String pid, ExtendedObjectClassDefinition.Scope scope, String value,
+		Set<String> declaredScopePropertyKeys) {
 
 		try {
 			Configuration[] configurations =
 				_configurationAdmin.listConfigurations(
-					getPidFilterString(pid, scope));
+					getPidFilterString(pid, scope, declaredScopePropertyKeys));
 
 			if (configurations == null) {
 				return new Configuration[0];

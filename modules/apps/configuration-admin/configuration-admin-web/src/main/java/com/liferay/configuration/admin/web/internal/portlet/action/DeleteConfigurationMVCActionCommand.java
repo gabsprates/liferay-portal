@@ -6,6 +6,7 @@
 package com.liferay.configuration.admin.web.internal.portlet.action;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
+import com.liferay.configuration.admin.util.ConfigurationScopePropertyKeyResolver;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContextFactory;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelRetriever;
@@ -57,7 +58,9 @@ public class DeleteConfigurationMVCActionCommand implements MVCActionCommand {
 			Configuration configuration =
 				_configurationModelRetriever.getConfiguration(
 					pid, configurationScopeDisplayContext.getScope(),
-					configurationScopeDisplayContext.getScopePK());
+					configurationScopeDisplayContext.getScopePK(), true,
+					_configurationScopePropertyKeyResolver.
+						getDeclaredScopePropertyKeys(pid));
 
 			if (configuration == null) {
 				return false;
@@ -77,5 +80,9 @@ public class DeleteConfigurationMVCActionCommand implements MVCActionCommand {
 
 	@Reference(target = "(!(filter.visibility=*))")
 	private ConfigurationModelRetriever _configurationModelRetriever;
+
+	@Reference
+	private ConfigurationScopePropertyKeyResolver
+		_configurationScopePropertyKeyResolver;
 
 }

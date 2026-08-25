@@ -6,6 +6,7 @@
 package com.liferay.configuration.admin.web.internal.model;
 
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
+import com.liferay.configuration.admin.web.internal.util.ScopePropertyKeysUtil;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition.Scope;
@@ -78,6 +79,10 @@ public class ConfigurationModel implements ExtendedObjectClassDefinition {
 			extendedObjectClassDefinition.getExtensionAttributes(
 				com.liferay.portal.configuration.metatype.annotations.
 					ExtendedObjectClassDefinition.XML_NAMESPACE);
+
+		_declaredScopePropertyKeys =
+			ScopePropertyKeysUtil.getDeclaredScopePropertyKeys(
+				extendedObjectClassDefinition);
 	}
 
 	public ConfigurationModel(
@@ -137,6 +142,10 @@ public class ConfigurationModel implements ExtendedObjectClassDefinition {
 		getConfigurationScopeDisplayContext() {
 
 		return _configurationScopeDisplayContext;
+	}
+
+	public Set<String> getDeclaredScopePropertyKeys() {
+		return _declaredScopePropertyKeys;
 	}
 
 	@Override
@@ -432,6 +441,7 @@ public class ConfigurationModel implements ExtendedObjectClassDefinition {
 	private Map<String, Object> _configurationOverrideProperties;
 	private final ConfigurationScopeDisplayContext
 		_configurationScopeDisplayContext;
+	private final Set<String> _declaredScopePropertyKeys;
 	private final ExtendedObjectClassDefinition _extendedObjectClassDefinition;
 	private final Map<String, String> _extensionAttributes;
 	private final boolean _factory;
