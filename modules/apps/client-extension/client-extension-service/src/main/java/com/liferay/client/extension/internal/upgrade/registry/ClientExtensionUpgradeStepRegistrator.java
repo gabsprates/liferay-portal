@@ -8,6 +8,7 @@ package com.liferay.client.extension.internal.upgrade.registry;
 import com.liferay.client.extension.internal.upgrade.v3_0_0.ClassNamesUpgradeProcess;
 import com.liferay.client.extension.internal.upgrade.v3_1_0.util.ClientExtensionEntryRelTable;
 import com.liferay.client.extension.internal.upgrade.v3_5_2.CETConfigurationUpgradeProcess;
+import com.liferay.client.extension.internal.upgrade.v3_5_3.ClientExtensionEntryPanelCategoryKeyUpgradeProcess;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.BaseExternalReferenceCodeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.CTModelUpgradeProcess;
@@ -114,6 +115,10 @@ public class ClientExtensionUpgradeStepRegistrator
 
 		registry.register(
 			"3.5.1", "3.5.2", new CETConfigurationUpgradeProcess());
+
+		registry.register(
+			"3.5.2", "3.5.3",
+			new ClientExtensionEntryPanelCategoryKeyUpgradeProcess());
 	}
 
 	@Reference
