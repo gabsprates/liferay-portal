@@ -8,6 +8,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClaySticker from '@clayui/sticker';
 import {cleanup, fireEvent, render} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import ClayCard, {
@@ -861,6 +862,45 @@ describe('ClayCardWithUser', () => {
 		);
 	});
 
+	it('does not prevent the default action on Enter when the card is a link', async () => {
+		const keyDownSpy = jest.fn();
+
+		document.addEventListener('keydown', keyDownSpy);
+
+		const {getByRole} = render(
+			<ClayCardWithNavigation href="#" title="Layout Page">
+				<img alt="portlet image" src="/some/path" />
+			</ClayCardWithNavigation>
+		);
+
+		getByRole('link').focus();
+
+		await userEvent.keyboard('{Enter}');
+
+		document.removeEventListener('keydown', keyDownSpy);
+
+		expect(keyDownSpy.mock.calls[0][0].defaultPrevented).toBe(false);
+	});
+
+	it('prevents the default action on Enter when the card is not a link', async () => {
+		const keyDownSpy = jest.fn();
+
+		document.addEventListener('keydown', keyDownSpy);
+
+		const {getByRole} = render(
+			<ClayCardWithNavigation onClick={() => {}} title="Layout Page">
+				<img alt="portlet image" src="/some/path" />
+			</ClayCardWithNavigation>
+		);
+
+		getByRole('button').focus();
+
+		await userEvent.keyboard('{Enter}');
+
+		document.removeEventListener('keydown', keyDownSpy);
+
+		expect(keyDownSpy.mock.calls[0][0].defaultPrevented).toBe(true);
+	});
 });
 
 describe('ClayCardWithHorizontal', () => {
