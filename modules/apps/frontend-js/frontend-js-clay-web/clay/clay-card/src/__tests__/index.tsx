@@ -813,6 +813,54 @@ describe('ClayCardWithUser', () => {
 
 		expect(onClickFn).toHaveBeenCalledTimes(1);
 	});
+
+	it('renders the description as a card subtitle', () => {
+		const {container} = render(
+			<ClayCardWithNavigation
+				description="Pick and choose your layout"
+				href="#"
+				title="Layout Page"
+			>
+				<img alt="portlet image" src="/some/path" />
+			</ClayCardWithNavigation>
+		);
+
+		const subtitle = container.querySelector('.card-subtitle');
+
+		expect(subtitle).toHaveTextContent('Pick and choose your layout');
+		expect(subtitle).toHaveClass('mt-1');
+		expect(container.querySelector('.card-text')).toBeNull();
+	});
+
+	it('left aligns the body and removes the title margin', () => {
+		const {container} = render(
+			<ClayCardWithNavigation href="#" title="Layout Page">
+				<img alt="portlet image" src="/some/path" />
+			</ClayCardWithNavigation>
+		);
+
+		expect(container.querySelector('.card-body')).toHaveClass('text-left');
+		expect(container.querySelector('.card-title')).toHaveClass('mb-0');
+	});
+
+	it('applies stickerClassName to the horizontal sticker', () => {
+		const {container} = render(
+			<ClayCardWithNavigation
+				horizontal
+				horizontalSymbol="user"
+				href="#"
+				spritemap="foo/bar"
+				stickerClassName="border-0 sticker-sm"
+				title="Layout Page"
+			/>
+		);
+
+		expect(container.querySelector('.sticker')).toHaveClass(
+			'border-0',
+			'sticker-sm'
+		);
+	});
+
 });
 
 describe('ClayCardWithHorizontal', () => {
