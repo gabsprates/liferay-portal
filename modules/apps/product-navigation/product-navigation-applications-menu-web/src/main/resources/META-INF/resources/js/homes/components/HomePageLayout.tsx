@@ -4,13 +4,13 @@
  */
 
 import {ClayCardWithNavigation} from '@clayui/card';
-import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClaySticker from '@clayui/sticker';
 import classNames from 'classnames';
 import React from 'react';
 
 import {CategoryItemGrouped} from '../types';
+import AppIcon from './AppIcon';
 
 type Props = {
 	displayType?: 'horizontal' | 'vertical';
@@ -79,14 +79,19 @@ const HomePageLayout = ({
 				{items.map((group) => {
 					if (!isHorizontal) {
 						return group.items.map((item) => (
-							<ClayLayout.Col key={item.id} lg={3} md={4} sm={6}>
-								<ClayCardWithNavigation
-									cardType="navigation"
+							<ClayLayout.Col
+								className="c-mb-4"
+								key={item.id}
+								lg={2}
+								md={3}
+								size={6}
+							>
+								<AppIcon
 									href={item.href}
-									title={item.label}
-								>
-									<ClayIcon symbol={item.leadingIcon} />
-								</ClayCardWithNavigation>
+									imageSrc={item.iconURL}
+									label={item.label}
+									symbol={item.leadingIcon}
+								/>
 							</ClayLayout.Col>
 						));
 					}
