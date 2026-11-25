@@ -10,6 +10,12 @@ import {navigate} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 import Toolbar from '../../common/components/Toolbar';
+import {
+	DEPOT_ENTRY_CLASS_NAME,
+	OBJECT_ENTRY_FOLDER_CLASS_NAME,
+} from '../../common/utils/constants';
+
+import './Permissions.scss';
 
 type DefaultsSection = 'contents' | 'files' | 'subfolders';
 
@@ -26,21 +32,35 @@ const DEFAULTS_SECTION_LABELS: Record<DefaultsSection, string> = {
 	subfolders: Liferay.Language.get('subfolders'),
 };
 
-const THIS_FOLDER = 'this-folder';
+const OWN_PERMISSIONS = 'own-permissions';
 
-function _getSectionLabel(section: string) {
-	if (section === THIS_FOLDER) {
+type SectionType = DefaultsSection | typeof OWN_PERMISSIONS;
+
+function _getSectionLabel(className: string, section: SectionType) {
+	if (section !== OWN_PERMISSIONS) {
+		return DEFAULTS_SECTION_LABELS[section];
+	}
+
+	if (className === OBJECT_ENTRY_FOLDER_CLASS_NAME) {
 		return Liferay.Language.get('this-folder');
 	}
 
-	return DEFAULTS_SECTION_LABELS[section as DefaultsSection];
+	if (className === DEPOT_ENTRY_CLASS_NAME) {
+		return Liferay.Language.get('this-space');
+	}
+
+	return Liferay.Language.get('permissions');
 }
 
 export default function Permissions({
 	backURL,
+	className,
 	defaultsSections,
 }: PermissionsProps) {
-	const [activeSection, setActiveSection] = useState<string>(THIS_FOLDER);
+	const [activeSection, setActiveSection] =
+		useState<SectionType>(OWN_PERMISSIONS);
+
+	const sections: SectionType[] = [OWN_PERMISSIONS, ...defaultsSections];
 
 	return (
 		<>
@@ -61,8 +81,8 @@ export default function Permissions({
 			</Toolbar>
 
 			<ClayLayout.ContainerFluid size={false}>
-				{defaultsSections.length ? (
-					<ClayLayout.Row className="min-vh-100">
+				<ClayLayout.Row className="min-vh-100">
+					{defaultsSections.length ? (
 						<ClayLayout.Col
 							className="cms-sidebar-nav sidebar-layout"
 							md="auto"
@@ -70,28 +90,35 @@ export default function Permissions({
 						>
 							<div className="px-md-2 py-3 py-md-4">
 								<ClayVerticalNav
-									items={[
-										THIS_FOLDER,
-										...defaultsSections,
-									].map((section) => ({
+									items={sections.map((section) => ({
 										active: activeSection === section,
-										label: _getSectionLabel(section),
-										onClick: () =>
-											setActiveSection(section),
+										label: _getSectionLabel(
+											className,
+											section
+										),
+										onClick: () => {
+											setActiveSection(section);
+										},
 									}))}
 								/>
 							</div>
 						</ClayLayout.Col>
+					) : (
+						<div className="min-vh-100 py-4" />
+					)}
 
-						<ClayLayout.Col className="col-md py-4" sm={12}>
+					<ClayLayout.Col className="col-md px-4 py-4" sm={12}>
+						<ClayLayout.ContainerFluid size="xxl">
 							<h2 className="text-5">
-								{_getSectionLabel(activeSection)}
+								{_getSectionLabel(className, activeSection)}
 							</h2>
-						</ClayLayout.Col>
-					</ClayLayout.Row>
-				) : (
-					<div className="min-vh-100 py-4" />
-				)}
+						</ClayLayout.ContainerFluid>
+					</ClayLayout.Col>
+
+					<aside className="cms-permissions-aside">
+						<p>{Liferay.Language.get('unsaved-changes')}</p>
+					</aside>
+				</ClayLayout.Row>
 			</ClayLayout.ContainerFluid>
 		</>
 	);

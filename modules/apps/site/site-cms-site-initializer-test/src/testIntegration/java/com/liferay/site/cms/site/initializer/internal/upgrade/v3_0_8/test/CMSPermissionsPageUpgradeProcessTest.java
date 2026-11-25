@@ -99,11 +99,10 @@ public class CMSPermissionsPageUpgradeProcessTest {
 		layout = _layoutLocalService.fetchLayoutByFriendlyURL(
 			group.getGroupId(), false, "/permissions");
 
-		Assert.assertNotNull(layout);
 		Assert.assertTrue(layout.isHidden());
-		Assert.assertEquals(LayoutConstants.TYPE_CONTENT, layout.getType());
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, layout.getStatus());
+		Assert.assertEquals(LayoutConstants.TYPE_CONTENT, layout.getType());
 
 		LayoutPageTemplateEntry masterLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
@@ -200,15 +199,6 @@ public class CMSPermissionsPageUpgradeProcessTest {
 				ResourceConstants.SCOPE_INDIVIDUAL, primKey,
 				cmsAdministratorRole.getRoleId(), "VIEW"));
 
-		Role siteMemberRole = _roleLocalService.getRole(
-			companyId, RoleConstants.SITE_MEMBER);
-
-		Assert.assertTrue(
-			_resourcePermissionLocalService.hasResourcePermission(
-				companyId, Layout.class.getName(),
-				ResourceConstants.SCOPE_INDIVIDUAL, primKey,
-				siteMemberRole.getRoleId(), "VIEW"));
-
 		Role guestRole = _roleLocalService.getRole(
 			companyId, RoleConstants.GUEST);
 
@@ -217,6 +207,15 @@ public class CMSPermissionsPageUpgradeProcessTest {
 				companyId, Layout.class.getName(),
 				ResourceConstants.SCOPE_INDIVIDUAL, primKey,
 				guestRole.getRoleId(), "VIEW"));
+
+		Role siteMemberRole = _roleLocalService.getRole(
+			companyId, RoleConstants.SITE_MEMBER);
+
+		Assert.assertTrue(
+			_resourcePermissionLocalService.hasResourcePermission(
+				companyId, Layout.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL, primKey,
+				siteMemberRole.getRoleId(), "VIEW"));
 	}
 
 	private static final String _CLASS_NAME =

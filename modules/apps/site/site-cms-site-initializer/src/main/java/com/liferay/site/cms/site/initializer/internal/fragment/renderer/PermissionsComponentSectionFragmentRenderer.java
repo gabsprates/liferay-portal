@@ -87,13 +87,7 @@ public class PermissionsComponentSectionFragmentRenderer
 			HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		String className = ParamUtil.getString(
-			httpServletRequest, "className");
-		long classPK = ParamUtil.getLong(httpServletRequest, "classPK");
+		String className = ParamUtil.getString(httpServletRequest, "className");
 
 		ModelResourcePermission<?> modelResourcePermission =
 			ModelResourcePermissionRegistryUtil.getModelResourcePermission(
@@ -102,6 +96,11 @@ public class PermissionsComponentSectionFragmentRenderer
 		if (modelResourcePermission == null) {
 			throw new PrincipalException();
 		}
+
+		long classPK = ParamUtil.getLong(httpServletRequest, "classPK");
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		modelResourcePermission.check(
 			themeDisplay.getPermissionChecker(), classPK,

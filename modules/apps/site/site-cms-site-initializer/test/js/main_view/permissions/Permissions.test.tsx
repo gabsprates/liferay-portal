@@ -65,9 +65,24 @@ describe('Permissions', () => {
 		);
 
 		expect(
-			screen.getByRole('heading', {name: 'permissions'})
+			screen.getByRole('heading', {level: 2, name: 'permissions'})
 		).toBeInTheDocument();
 		expect(screen.queryByText('this-folder')).not.toBeInTheDocument();
+	});
+
+	it('labels the first section for a space', () => {
+		render(
+			<Permissions
+				backURL={BACK_URL}
+				className="com.liferay.depot.model.DepotEntry"
+				classPK={1}
+				defaultsSections={['subfolders']}
+			/>
+		);
+
+		expect(
+			screen.getByRole('heading', {level: 2, name: 'this-space'})
+		).toBeInTheDocument();
 	});
 
 	it('returns to the previous view on cancel', async () => {

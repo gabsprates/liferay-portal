@@ -292,13 +292,12 @@ public class ViewContentsSectionDisplayContextTest
 			fdsActionDropdownItems.get(15);
 
 		FrontendDataSetTestUtil.assertFDSActionDropdownItem(
-			"password-policies", "edit-permissions", "Permissions", "get",
-			editPermissionsFDSActionDropdownItem);
+			"password-policies", "edit-permissions", "Manage Permissions",
+			"get", editPermissionsFDSActionDropdownItem);
 
 		String href = (String)editPermissionsFDSActionDropdownItem.get("href");
 
 		Assert.assertTrue(
-			href,
 			href.contains(
 				GroupConstants.CMS_FRIENDLY_URL +
 					"/permissions?className={entryClassName}&classPK=" +

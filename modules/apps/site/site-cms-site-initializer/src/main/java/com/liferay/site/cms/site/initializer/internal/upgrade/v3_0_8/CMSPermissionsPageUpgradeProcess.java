@@ -175,16 +175,18 @@ public class CMSPermissionsPageUpgradeProcess extends UpgradeProcess {
 			return;
 		}
 
-		if (_layoutLocalService.fetchFirstLayout(
-				group.getGroupId(), false,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, false) == null) {
+		Layout firstLayout = _layoutLocalService.fetchFirstLayout(
+			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			false);
 
+		if (firstLayout == null) {
 			return;
 		}
 
-		if (_layoutLocalService.fetchLayoutByFriendlyURL(
-				group.getGroupId(), false, "/permissions") != null) {
+		Layout permissionsLayout = _layoutLocalService.fetchLayoutByFriendlyURL(
+			group.getGroupId(), false, "/permissions");
 
+		if (permissionsLayout != null) {
 			return;
 		}
 

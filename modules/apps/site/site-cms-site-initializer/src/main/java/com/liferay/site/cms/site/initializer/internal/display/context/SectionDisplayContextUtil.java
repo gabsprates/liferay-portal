@@ -847,7 +847,7 @@ public class SectionDisplayContextUtil {
 				"share"
 			));
 
-		_addEditPermissionsAction(
+		_addEditPermissionsFDSActionDropdownItem(
 			fdsActionDropdownItems, httpServletRequest, themeDisplay);
 
 		fdsActionDropdownItems.add(
@@ -1206,7 +1206,7 @@ public class SectionDisplayContextUtil {
 			));
 	}
 
-	private static void _addEditPermissionsAction(
+	private static void _addEditPermissionsFDSActionDropdownItem(
 		List<FDSActionDropdownItem> fdsActionDropdownItems,
 		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
@@ -1227,7 +1227,7 @@ public class SectionDisplayContextUtil {
 			).setIcon(
 				"password-policies"
 			).setLabel(
-				LanguageUtil.get(httpServletRequest, "permissions")
+				LanguageUtil.get(httpServletRequest, "manage-permissions")
 			).setMethod(
 				"get"
 			).setPermissionKey(
