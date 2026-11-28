@@ -212,6 +212,23 @@ describe('Permissions', () => {
 		expect(screen.queryByText('this-folder')).not.toBeInTheDocument();
 	});
 
+	it('labels the first section for a space', () => {
+		render(
+			<Permissions
+				actions={{}}
+				backURL={BACK_URL}
+				className="com.liferay.depot.model.DepotEntry"
+				classPK={1}
+				defaultsSections={['subfolders']}
+				roles={[]}
+			/>
+		);
+
+		expect(
+			screen.getByRole('heading', {level: 2, name: 'this-space'})
+		).toBeInTheDocument();
+	});
+
 	it('returns to the previous view on cancel', async () => {
 		_mockFolderPermissions();
 

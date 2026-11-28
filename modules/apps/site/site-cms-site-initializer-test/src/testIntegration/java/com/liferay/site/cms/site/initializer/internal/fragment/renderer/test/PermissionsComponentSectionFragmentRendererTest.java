@@ -25,6 +25,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -178,16 +179,12 @@ public class PermissionsComponentSectionFragmentRendererTest {
 	@Test
 	@TestInfo("LPD-116792")
 	public void testGetPropsActions() throws Exception {
-		ObjectEntryFolder objectEntryFolder =
-			ObjectEntryFolderTestUtil.addObjectEntryFolder(
-				_depotEntry.getGroupId(),
-				_getRootObjectEntryFolderId(
-					ObjectEntryFolderConstants.
-						EXTERNAL_REFERENCE_CODE_CONTENTS));
+
+		// Space
 
 		Map<String, Object> props = _getProps(
-			RandomTestUtil.randomString(), ObjectEntryFolder.class.getName(),
-			objectEntryFolder.getObjectEntryFolderId());
+			RandomTestUtil.randomString(), DepotEntry.class.getName(),
+			_depotEntry.getDepotEntryId());
 
 		Map<String, Map<String, Object>[]> actions =
 			(Map<String, Map<String, Object>[]>)props.get("actions");
@@ -197,7 +194,7 @@ public class PermissionsComponentSectionFragmentRendererTest {
 				Arrays.asList(
 					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS,
 					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_FILES,
-					"OBJECT_ENTRY_FOLDERS")),
+					"OBJECT_ENTRY_FOLDERS", "SPACE")),
 			actions.keySet());
 
 		_assertActions(
@@ -211,11 +208,10 @@ public class PermissionsComponentSectionFragmentRendererTest {
 		_assertActions(
 			ObjectEntryFolder.class.getName(),
 			actions.get("OBJECT_ENTRY_FOLDERS"));
-	}
+		_assertActions(DepotEntry.class.getName(), actions.get("SPACE"));
 
-	@Test
-	@TestInfo("LPD-116792")
-	public void testGetPropsDefaultPermissions() throws Exception {
+		// Folder
+
 		ObjectEntryFolder objectEntryFolder =
 			ObjectEntryFolderTestUtil.addObjectEntryFolder(
 				_depotEntry.getGroupId(),
@@ -223,21 +219,102 @@ public class PermissionsComponentSectionFragmentRendererTest {
 					ObjectEntryFolderConstants.
 						EXTERNAL_REFERENCE_CODE_CONTENTS));
 
+		props = _getProps(
+			RandomTestUtil.randomString(), ObjectEntryFolder.class.getName(),
+			objectEntryFolder.getObjectEntryFolderId());
+
+		actions = (Map<String, Map<String, Object>[]>)props.get("actions");
+
+		Assert.assertEquals(
+			new HashSet<>(
+				Arrays.asList(
+					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS,
+					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_FILES,
+					"OBJECT_ENTRY_FOLDERS")),
+			actions.keySet());
+
+		// Object entry
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			objectEntryFolder.getObjectEntryFolderId());
+
+		props = _getProps(
+			RandomTestUtil.randomString(), objectEntry.getModelClassName(),
+			objectEntry.getObjectEntryId());
+
+		actions = (Map<String, Map<String, Object>[]>)props.get("actions");
+
+		Assert.assertEquals(
+			Collections.singleton(
+				ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS),
+			actions.keySet());
+
+		_assertActions(
+			objectEntry.getModelClassName(),
+			actions.get(
+				ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS));
+	}
+
+	@Test
+	@TestInfo("LPD-116792")
+	public void testGetPropsDefaultPermissions() throws Exception {
+
+		// Space
+
+		Group group = _depotEntry.getGroup();
+
+		JSONObject spaceJSONObject = _updateDefaultPermissions(
+			group.getExternalReferenceCode(), DepotEntry.class.getName(),
+			JSONUtil.put(
+				"OBJECT_ENTRY_FOLDERS",
+				JSONUtil.put(
+					RoleConstants.GUEST, JSONUtil.put(ActionKeys.VIEW))));
+
+		Map<String, Object> props = _getProps(
+			RandomTestUtil.randomString(), DepotEntry.class.getName(),
+			_depotEntry.getDepotEntryId());
+
+		Assert.assertEquals(
+			spaceJSONObject.toMap(), props.get("defaultPermissions"));
+
+		// Folder
+
+		ObjectEntryFolder objectEntryFolder =
+			ObjectEntryFolderTestUtil.addObjectEntryFolder(
+				_depotEntry.getGroupId(),
+				_getRootObjectEntryFolderId(
+					ObjectEntryFolderConstants.
+						EXTERNAL_REFERENCE_CODE_CONTENTS));
+
+		JSONObject contentsJSONObject = JSONUtil.put(
+			RoleConstants.USER,
+			JSONUtil.putAll(ActionKeys.UPDATE, ActionKeys.VIEW));
+
 		JSONObject folderJSONObject = _updateDefaultPermissions(
 			objectEntryFolder.getExternalReferenceCode(),
 			ObjectEntryFolder.class.getName(),
 			JSONUtil.put(
 				ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS,
-				JSONUtil.put(
-					RoleConstants.USER,
-					JSONUtil.putAll(ActionKeys.UPDATE, ActionKeys.VIEW))));
+				contentsJSONObject));
 
-		Map<String, Object> props = _getProps(
+		props = _getProps(
 			RandomTestUtil.randomString(), ObjectEntryFolder.class.getName(),
 			objectEntryFolder.getObjectEntryFolderId());
 
 		Assert.assertEquals(
 			folderJSONObject.toMap(), props.get("defaultPermissions"));
+
+		// Object entry inside the folder
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			objectEntryFolder.getObjectEntryFolderId());
+
+		props = _getProps(
+			RandomTestUtil.randomString(), objectEntry.getModelClassName(),
+			objectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			contentsJSONObject.toMap(), props.get("defaultPermissions"));
 	}
 
 	@Test

@@ -175,6 +175,46 @@ public class CMSDefaultPermissionUtil {
 	}
 
 	public static JSONObject getCMSDefaultPermissionJSONObject(
+			ObjectEntry objectEntry, FilterFactory<Predicate> filterFactory)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionLocalServiceUtil.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMS_DEFAULT_PERMISSION", objectEntry.getCompanyId());
+
+		if (objectDefinition == null) {
+			return null;
+		}
+
+		if (objectEntry.getObjectEntryFolderId() !=
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT) {
+
+			ObjectEntryFolder parentObjectEntryFolder =
+				ObjectEntryFolderLocalServiceUtil.getObjectEntryFolder(
+					objectEntry.getObjectEntryFolderId());
+
+			JSONObject jsonObject = getJSONObject(
+				parentObjectEntryFolder.getCompanyId(),
+				parentObjectEntryFolder.getUserId(),
+				parentObjectEntryFolder.getExternalReferenceCode(),
+				parentObjectEntryFolder.getModelClassName(), filterFactory);
+
+			if ((jsonObject != null) && !JSONUtil.isEmpty(jsonObject)) {
+				return jsonObject;
+			}
+		}
+
+		Group group = GroupLocalServiceUtil.getGroup(objectEntry.getGroupId());
+
+		return getJSONObject(
+			group.getCompanyId(), group.getCreatorUserId(),
+			group.getExternalReferenceCode(), DepotEntry.class.getName(),
+			filterFactory);
+	}
+
+	public static JSONObject getCMSDefaultPermissionJSONObject(
 			ObjectEntryFolder objectEntryFolder,
 			FilterFactory<Predicate> filterFactory)
 		throws PortalException {

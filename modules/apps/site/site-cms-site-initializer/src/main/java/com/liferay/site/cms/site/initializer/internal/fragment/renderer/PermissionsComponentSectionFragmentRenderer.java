@@ -5,17 +5,23 @@
 
 package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.entry.folder.util.ObjectEntryFolderUtil;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -113,7 +119,8 @@ public class PermissionsComponentSectionFragmentRenderer
 			ActionKeys.PERMISSIONS);
 
 		return HashMapBuilder.<String, Object>put(
-			"actions", _getActions(className, httpServletRequest, themeDisplay)
+			"actions",
+			_getActions(className, classPK, httpServletRequest, themeDisplay)
 		).put(
 			"backURL", _getBackURL(httpServletRequest, themeDisplay)
 		).put(
@@ -130,14 +137,46 @@ public class PermissionsComponentSectionFragmentRenderer
 	}
 
 	private Map<String, Map<String, Object>[]> _getActions(
-		String className, HttpServletRequest httpServletRequest,
-		ThemeDisplay themeDisplay) {
+			String className, long classPK,
+			HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay)
+		throws Exception {
 
-		if (!Objects.equals(className, ObjectEntryFolder.class.getName())) {
+		if (Objects.equals(className, DepotEntry.class.getName())) {
+			Map<String, Map<String, Object>[]> actions =
+				PermissionUtil.getActionsMap(httpServletRequest, themeDisplay);
+
+			actions.put(
+				"SPACE",
+				PermissionUtil.getActions(className, httpServletRequest));
+
+			return actions;
+		}
+
+		if (Objects.equals(className, ObjectEntryFolder.class.getName())) {
+			return PermissionUtil.getActionsMap(
+				httpServletRequest, themeDisplay);
+		}
+
+		if (!className.startsWith(ObjectDefinition.class.getName())) {
 			return Collections.emptyMap();
 		}
 
-		return PermissionUtil.getActionsMap(httpServletRequest, themeDisplay);
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			classPK);
+
+		ObjectEntryFolder rootObjectEntryFolder =
+			_objectEntryFolderLocalService.fetchObjectEntryFolder(
+				ObjectEntryFolderUtil.getRootObjectEntryFolderId(
+					objectEntry.getObjectEntryFolderId()));
+
+		if (rootObjectEntryFolder == null) {
+			return Collections.emptyMap();
+		}
+
+		return HashMapBuilder.<String, Map<String, Object>[]>put(
+			rootObjectEntryFolder.getExternalReferenceCode(),
+			PermissionUtil.getActions(className, httpServletRequest)
+		).build();
 	}
 
 	private String _getBackURL(
@@ -158,17 +197,34 @@ public class PermissionsComponentSectionFragmentRenderer
 			String className, long classPK)
 		throws Exception {
 
-		if (!Objects.equals(className, ObjectEntryFolder.class.getName())) {
-			return Collections.emptyMap();
+		JSONObject jsonObject = null;
+
+		if (Objects.equals(className, DepotEntry.class.getName())) {
+			DepotEntry depotEntry = _depotEntryLocalService.getDepotEntry(
+				classPK);
+
+			Group group = depotEntry.getGroup();
+
+			jsonObject = CMSDefaultPermissionUtil.getJSONObject(
+				group.getCompanyId(), group.getCreatorUserId(),
+				group.getExternalReferenceCode(), className, _filterFactory);
+		}
+		else if (Objects.equals(className, ObjectEntryFolder.class.getName())) {
+			ObjectEntryFolder objectEntryFolder =
+				_objectEntryFolderLocalService.getObjectEntryFolder(classPK);
+
+			jsonObject = CMSDefaultPermissionUtil.getJSONObject(
+				objectEntryFolder.getCompanyId(), objectEntryFolder.getUserId(),
+				objectEntryFolder.getExternalReferenceCode(), className,
+				_filterFactory);
+		}
+		else if (className.startsWith(ObjectDefinition.class.getName())) {
+			jsonObject = _getObjectEntryDefaultPermissionsJSONObject(classPK);
 		}
 
-		ObjectEntryFolder objectEntryFolder =
-			_objectEntryFolderLocalService.getObjectEntryFolder(classPK);
-
-		JSONObject jsonObject = CMSDefaultPermissionUtil.getJSONObject(
-			objectEntryFolder.getCompanyId(), objectEntryFolder.getUserId(),
-			objectEntryFolder.getExternalReferenceCode(), className,
-			_filterFactory);
+		if (jsonObject == null) {
+			return Collections.emptyMap();
+		}
 
 		return jsonObject.toMap();
 	}
@@ -203,6 +259,34 @@ public class PermissionsComponentSectionFragmentRenderer
 		return ListUtil.fromArray("subfolders");
 	}
 
+	private JSONObject _getObjectEntryDefaultPermissionsJSONObject(
+			long objectEntryId)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			objectEntryId);
+
+		JSONObject jsonObject =
+			CMSDefaultPermissionUtil.getCMSDefaultPermissionJSONObject(
+				objectEntry, _filterFactory);
+
+		if (jsonObject == null) {
+			return null;
+		}
+
+		ObjectEntryFolder rootObjectEntryFolder =
+			_objectEntryFolderLocalService.fetchObjectEntryFolder(
+				ObjectEntryFolderUtil.getRootObjectEntryFolderId(
+					objectEntry.getObjectEntryFolderId()));
+
+		if (rootObjectEntryFolder == null) {
+			return null;
+		}
+
+		return jsonObject.getJSONObject(
+			rootObjectEntryFolder.getExternalReferenceCode());
+	}
+
 	private Map<String, Object>[] _getRoles(
 			String className, long classPK, ThemeDisplay themeDisplay)
 		throws Exception {
@@ -218,6 +302,9 @@ public class PermissionsComponentSectionFragmentRenderer
 			className, objectEntryFolder.getGroupId(), themeDisplay);
 	}
 
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
+
 	@Reference(
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
 	)
@@ -225,5 +312,8 @@ public class PermissionsComponentSectionFragmentRenderer
 
 	@Reference
 	private ObjectEntryFolderLocalService _objectEntryFolderLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 }

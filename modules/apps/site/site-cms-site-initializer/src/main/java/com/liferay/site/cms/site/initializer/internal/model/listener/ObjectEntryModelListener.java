@@ -6,7 +6,6 @@
 package com.liferay.site.cms.site.initializer.internal.model.listener;
 
 import com.liferay.depot.constants.DepotRolesConstants;
-import com.liferay.depot.model.DepotEntry;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.model.ObjectDefinition;
@@ -24,7 +23,6 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -32,7 +30,6 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -114,43 +111,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 	}
 
-	private JSONObject _getCMSDefaultPermissionJSONObject(
-			ObjectEntry objectEntry)
-		throws Exception {
-
-		ObjectDefinition cmsDefaultPermissionObjectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMS_DEFAULT_PERMISSION", objectEntry.getCompanyId());
-
-		if (cmsDefaultPermissionObjectDefinition == null) {
-			return null;
-		}
-
-		if (objectEntry.getObjectEntryFolderId() != 0) {
-			ObjectEntryFolder parentObjectEntryFolder =
-				_objectEntryFolderLocalService.getObjectEntryFolder(
-					objectEntry.getObjectEntryFolderId());
-
-			JSONObject jsonObject = CMSDefaultPermissionUtil.getJSONObject(
-				parentObjectEntryFolder.getCompanyId(),
-				parentObjectEntryFolder.getUserId(),
-				parentObjectEntryFolder.getExternalReferenceCode(),
-				parentObjectEntryFolder.getModelClassName(), _filterFactory);
-
-			if ((jsonObject != null) && !JSONUtil.isEmpty(jsonObject)) {
-				return jsonObject;
-			}
-		}
-
-		Group group = _groupLocalService.getGroup(objectEntry.getGroupId());
-
-		return CMSDefaultPermissionUtil.getJSONObject(
-			group.getCompanyId(), group.getCreatorUserId(),
-			group.getExternalReferenceCode(), DepotEntry.class.getName(),
-			_filterFactory);
-	}
-
 	private ObjectEntryFolder _getRootObjectEntryFolder(
 		ObjectEntry objectEntry) {
 
@@ -187,7 +147,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws Exception {
 
 		JSONObject defaultPermissionsJSONObject =
-			_getCMSDefaultPermissionJSONObject(objectEntry);
+			CMSDefaultPermissionUtil.getCMSDefaultPermissionJSONObject(
+				objectEntry, _filterFactory);
 
 		if ((defaultPermissionsJSONObject == null) ||
 			JSONUtil.isEmpty(defaultPermissionsJSONObject)) {
@@ -258,9 +219,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
 	)
 	private FilterFactory<Predicate> _filterFactory;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;
