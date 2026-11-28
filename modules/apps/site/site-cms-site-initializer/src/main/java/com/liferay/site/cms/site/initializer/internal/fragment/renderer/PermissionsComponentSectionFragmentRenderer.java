@@ -7,11 +7,15 @@ package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.entry.folder.util.ObjectEntryFolderUtil;
 import com.liferay.object.model.ObjectEntryFolder;
+import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -24,6 +28,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.site.cms.site.initializer.internal.util.PermissionUtil;
+import com.liferay.site.cms.site.initializer.util.CMSDefaultPermissionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -107,14 +113,31 @@ public class PermissionsComponentSectionFragmentRenderer
 			ActionKeys.PERMISSIONS);
 
 		return HashMapBuilder.<String, Object>put(
+			"actions", _getActions(className, httpServletRequest, themeDisplay)
+		).put(
 			"backURL", _getBackURL(httpServletRequest, themeDisplay)
 		).put(
 			"className", className
 		).put(
 			"classPK", classPK
 		).put(
+			"defaultPermissions", _getDefaultPermissions(className, classPK)
+		).put(
 			"defaultsSections", _getDefaultsSections(className, classPK)
+		).put(
+			"roles", _getRoles(className, classPK, themeDisplay)
 		).build();
+	}
+
+	private Map<String, Map<String, Object>[]> _getActions(
+		String className, HttpServletRequest httpServletRequest,
+		ThemeDisplay themeDisplay) {
+
+		if (!Objects.equals(className, ObjectEntryFolder.class.getName())) {
+			return Collections.emptyMap();
+		}
+
+		return PermissionUtil.getActionsMap(httpServletRequest, themeDisplay);
 	}
 
 	private String _getBackURL(
@@ -129,6 +152,25 @@ public class PermissionsComponentSectionFragmentRenderer
 
 		return themeDisplay.getPathFriendlyURLPublic() +
 			GroupConstants.CMS_FRIENDLY_URL;
+	}
+
+	private Map<String, Object> _getDefaultPermissions(
+			String className, long classPK)
+		throws Exception {
+
+		if (!Objects.equals(className, ObjectEntryFolder.class.getName())) {
+			return Collections.emptyMap();
+		}
+
+		ObjectEntryFolder objectEntryFolder =
+			_objectEntryFolderLocalService.getObjectEntryFolder(classPK);
+
+		JSONObject jsonObject = CMSDefaultPermissionUtil.getJSONObject(
+			objectEntryFolder.getCompanyId(), objectEntryFolder.getUserId(),
+			objectEntryFolder.getExternalReferenceCode(), className,
+			_filterFactory);
+
+		return jsonObject.toMap();
 	}
 
 	private List<String> _getDefaultsSections(String className, long classPK) {
@@ -160,6 +202,26 @@ public class PermissionsComponentSectionFragmentRenderer
 
 		return ListUtil.fromArray("subfolders");
 	}
+
+	private Map<String, Object>[] _getRoles(
+			String className, long classPK, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		if (!Objects.equals(className, ObjectEntryFolder.class.getName())) {
+			return new Map[0];
+		}
+
+		ObjectEntryFolder objectEntryFolder =
+			_objectEntryFolderLocalService.getObjectEntryFolder(classPK);
+
+		return PermissionUtil.getRoles(
+			className, objectEntryFolder.getGroupId(), themeDisplay);
+	}
+
+	@Reference(
+		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
+	)
+	private FilterFactory<Predicate> _filterFactory;
 
 	@Reference
 	private ObjectEntryFolderLocalService _objectEntryFolderLocalService;

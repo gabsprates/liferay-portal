@@ -7,60 +7,66 @@ import ClayButton from '@clayui/button';
 import ClayLayout from '@clayui/layout';
 import {ClayVerticalNav} from '@clayui/nav';
 import {navigate} from 'frontend-js-web';
-import React, {useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
 import Toolbar from '../../common/components/Toolbar';
 import {
-	DEPOT_ENTRY_CLASS_NAME,
-	OBJECT_ENTRY_FOLDER_CLASS_NAME,
-} from '../../common/utils/constants';
+	ActionsMap,
+	Role,
+	RoleSelectedActions,
+} from '../default_permission/DefaultPermissionTypes';
+import PermissionsMatrix from './PermissionsMatrix';
+import {DefaultsSection, OWN_PERMISSIONS} from './PermissionsPageConfig';
+import getPermissionsPageConfig from './getPermissionsPageConfig';
 
 import './Permissions.scss';
 
-type DefaultsSection = 'contents' | 'files' | 'subfolders';
-
 interface PermissionsProps {
+	actions: ActionsMap;
 	backURL: string;
 	className: string;
 	classPK: number;
 	defaultsSections: DefaultsSection[];
-}
-
-const DEFAULTS_SECTION_LABELS: Record<DefaultsSection, string> = {
-	contents: Liferay.Language.get('contents'),
-	files: Liferay.Language.get('files'),
-	subfolders: Liferay.Language.get('subfolders'),
-};
-
-const OWN_PERMISSIONS = 'own-permissions';
-
-type SectionType = DefaultsSection | typeof OWN_PERMISSIONS;
-
-function _getSectionLabel(className: string, section: SectionType) {
-	if (section !== OWN_PERMISSIONS) {
-		return DEFAULTS_SECTION_LABELS[section];
-	}
-
-	if (className === OBJECT_ENTRY_FOLDER_CLASS_NAME) {
-		return Liferay.Language.get('this-folder');
-	}
-
-	if (className === DEPOT_ENTRY_CLASS_NAME) {
-		return Liferay.Language.get('this-space');
-	}
-
-	return Liferay.Language.get('permissions');
+	roles: Role[];
 }
 
 export default function Permissions({
+	actions,
 	backURL,
 	className,
+	classPK,
 	defaultsSections,
+	roles,
 }: PermissionsProps) {
-	const [activeSection, setActiveSection] =
-		useState<SectionType>(OWN_PERMISSIONS);
+	const [activeSectionKey, setActiveSectionKey] =
+		useState<string>(OWN_PERMISSIONS);
+	const [values, setValues] = useState<Record<string, RoleSelectedActions>>(
+		{}
+	);
 
-	const sections: SectionType[] = [OWN_PERMISSIONS, ...defaultsSections];
+	const {sections} = useMemo(
+		() =>
+			getPermissionsPageConfig({
+				actions,
+				className,
+				classPK,
+				defaultsSections,
+			}),
+		[actions, className, classPK, defaultsSections]
+	);
+
+	const activeSection =
+		sections.find((section) => section.key === activeSectionKey) ||
+		sections[0];
+
+	const handleChange = useCallback(
+		(sectionKey: string, sectionValues: RoleSelectedActions) =>
+			setValues((previousValues) => ({
+				...previousValues,
+				[sectionKey]: sectionValues,
+			})),
+		[]
+	);
 
 	return (
 		<>
@@ -82,7 +88,7 @@ export default function Permissions({
 
 			<ClayLayout.ContainerFluid size={false}>
 				<ClayLayout.Row className="min-vh-100">
-					{defaultsSections.length ? (
+					{sections.length > 1 ? (
 						<ClayLayout.Col
 							className="cms-sidebar-nav sidebar-layout"
 							md="auto"
@@ -92,12 +98,9 @@ export default function Permissions({
 								<ClayVerticalNav
 									items={sections.map((section) => ({
 										active: activeSection === section,
-										label: _getSectionLabel(
-											className,
-											section
-										),
+										label: section.label,
 										onClick: () => {
-											setActiveSection(section);
+											setActiveSectionKey(section.key);
 										},
 									}))}
 								/>
@@ -109,9 +112,29 @@ export default function Permissions({
 
 					<ClayLayout.Col className="col-md px-4 py-4" sm={12}>
 						<ClayLayout.ContainerFluid size="xxl">
-							<h2 className="text-5">
-								{_getSectionLabel(className, activeSection)}
+							<h2
+								className={
+									activeSection.description
+										? 'mb-1 text-5'
+										: 'text-5'
+								}
+							>
+								{activeSection.label}
 							</h2>
+
+							{activeSection.description && (
+								<p className="text-3 text-secondary">
+									{activeSection.description}
+								</p>
+							)}
+
+							<PermissionsMatrix
+								key={activeSection.key}
+								onChange={handleChange}
+								roles={roles}
+								section={activeSection}
+								values={values[activeSection.key]}
+							/>
 						</ClayLayout.ContainerFluid>
 					</ClayLayout.Col>
 
